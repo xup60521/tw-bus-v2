@@ -124,18 +124,20 @@ const OverlayList = ({
                       //   router.push(
                       //     `?bus=${item.RouteName.Zh_tw}&direction=${item.Direction}&station=${station}`
                       //   );
-                      setURLSearchParams({
-                        key: "bus",
-                        value: item.RouteName.Zh_tw,
-                      });
-                      setURLSearchParams({
-                        key: "direction",
-                        value: `${item.Direction}`,
-                      });
-                      setURLSearchParams({
-                        key: "page",
-                        value: "bus",
-                      });
+                      setURLSearchParams([
+                        {
+                          key: "bus",
+                          value: item.RouteName.Zh_tw,
+                        },
+                        {
+                          key: "direction",
+                          value: `${item.Direction}`,
+                        },
+                        {
+                          key: "page",
+                          value: "bus",
+                        },
+                      ]);
                     }}
                   >
                     <span>查看公車</span>

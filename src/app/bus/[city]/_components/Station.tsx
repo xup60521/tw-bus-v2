@@ -132,10 +132,10 @@ function PopupSetStation({
                     <div
                       onClick={() => {
                         setOpen(false);
-                        setURLSearchParams({
+                        setURLSearchParams([{
                           key: "station",
                           value: item,
-                        });
+                        }]);
                         // setStation(item);
                         // router.push(`?bus=${bus}&direction=${direction}&station=${item}`)
                       }}
@@ -199,16 +199,16 @@ const BusList = ({
                 />
                 <button
                   onClick={() => {
-                    setURLSearchParams({
+                    setURLSearchParams([{
                       key: "bus",
                       value: item.RouteName.Zh_tw,
-                    });
-                    setURLSearchParams({
+                    },{
                       key: "direction",
                       value: String(
                         item.Direction === 255 ? 0 : item.Direction
                       ),
-                    });
+                    }]);
+                    
                     // setBus(item.RouteName.Zh_tw);
                     // setDirection(
                     //   String(item.Direction === 255 ? 0 : item.Direction)
@@ -242,20 +242,19 @@ const BusList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
-                      setURLSearchParams({
+                      setURLSearchParams([{
                         key: "bus",
                         value: item.RouteName.Zh_tw,
-                      });
-                      setURLSearchParams({
+                      },{
                         key: "direction",
                         value: String(
                           item.Direction === 255 ? 0 : item.Direction
                         ),
-                      });
-                      setURLSearchParams({
+                      },{
                         key: "page",
                         value: "bus",
-                      });
+                      }]);
+                      
                       //   setDirection(
                       //     String(item.Direction === 255 ? 0 : item.Direction)
                       //   );

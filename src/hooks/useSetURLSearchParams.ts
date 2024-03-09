@@ -3,16 +3,18 @@
 import { useRouter, useSearchParams } from "next/navigation"
 
 export type SetURLSearchParamsInputProps = {
-    "key": string,
-    "value": string
+    key: string,
+    value: string
 }
 
 export function useSetURLSearchParams() {
     const searchParams = useSearchParams()
     const router = useRouter()
-    return function useSetURLSearchParams(prop: SetURLSearchParamsInputProps) {
+    return function useSetURLSearchParams(list: SetURLSearchParamsInputProps[]) {
         const url = new URLSearchParams(searchParams.toString())
-        url.set(prop.key, prop.value)
+        list.forEach((item) => {
+            url.set(item.key, item.value)
+        })
         router.push(`?${url.toString()}`)
     }
 }

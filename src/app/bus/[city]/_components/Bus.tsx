@@ -79,15 +79,15 @@ export default function Bus({
           {bus && (
             <>
               <button
-                onClick={add_remove_overlay}
-                className={`box-border flex px-2 h-8 py-2 items-center justify-center rounded-md border-[1px] text-white font-bold transition-all ${
-                  isOverlayed
-                    ? "border-red-300 text-red-300 hover:bg-red-300 hover:text-white"
-                    : " border-white hover:bg-white hover:text-slate-700"
-                }`}
-              >
-                {isOverlayed ? <FiMinus /> : <FiPlus />}
-              </button>
+            onClick={add_remove_overlay}
+            className={`box-border flex px-2 h-8 py-2 items-center justify-center rounded-md border-[1px] text-white font-bold transition-all ${
+              isOverlayed
+                ? "border-red-300 text-red-300 hover:bg-red-300 hover:text-white"
+                : " border-white hover:bg-white hover:text-slate-700"
+            }`}
+          >
+            {isOverlayed ? <FiMinus /> : <FiPlus />}
+          </button>
               <div
                 className={`w-full ${
                   isOneWay ? "" : "grid grid-cols-2 gap-1"
@@ -100,7 +100,7 @@ export default function Bus({
                     direction === "0" ? "bg-white text-black" : "text-white"
                   }`}
                   onClick={() => {
-                    setURLSearchParams({ key: "direction", value: "0" });
+                    setURLSearchParams([{ key: "direction", value: "0" }]);
                   }}
                 >
                   {headto0 ? `往${headto0}` : " "}
@@ -113,7 +113,7 @@ export default function Bus({
                       direction === "1" ? "text-black bg-white" : "text-white"
                     }`}
                     onClick={() => {
-                      setURLSearchParams({ key: "direction", value: "1" });
+                      setURLSearchParams([{ key: "direction", value: "1" }]);
                     }}
                   >
                     {headto1 ? `往${headto1}` : " "}
@@ -157,7 +157,7 @@ function DrawerSection({
   initBusList: BusList[];
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setURLSearchParams: (prop: SetURLSearchParamsInputProps) => void;
+  setURLSearchParams: (prop: SetURLSearchParamsInputProps[]) => void;
   // setBus: SetAtom<[SetStateAction<string>], void>;
   // setDirection: SetAtom<[SetStateAction<string>], void>;
   // router: AppRouterInstance;
@@ -228,14 +228,16 @@ function DrawerSection({
                         onClick={() => {
                           closeBtnRef.current?.click();
                           setQString("");
-                          setURLSearchParams({
-                            key: "bus",
-                            value: item.RouteName.Zh_tw,
-                          });
-                          setURLSearchParams({
-                            key: "direction",
-                            value: "0",
-                          });
+                          setURLSearchParams([
+                            {
+                              key: "bus",
+                              value: item.RouteName.Zh_tw,
+                            },
+                            {
+                              key: "direction",
+                              value: "0",
+                            },
+                          ]);
                           // setBus(item.RouteName.Zh_tw);
                           // setDirection("0");
                           // router.push(
@@ -279,7 +281,7 @@ const StopList = ({
   list?: BusEst[];
   isLoading: boolean;
   stops?: BusStops["Stops"];
-  setURLSearchParams: (prop: SetURLSearchParamsInputProps) => void;
+  setURLSearchParams: (prop: SetURLSearchParamsInputProps[]) => void;
   searchParams: ReadonlyURLSearchParams;
 }) => {
   const setToggleStop = useSetAtom(toggleStopAtom);
@@ -337,14 +339,16 @@ const StopList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
-                      setURLSearchParams({
-                        key: "station",
-                        value: item.StopName.Zh_tw,
-                      });
-                      setURLSearchParams({
-                        key: "page",
-                        value: "station",
-                      });
+                      setURLSearchParams([
+                        {
+                          key: "station",
+                          value: item.StopName.Zh_tw,
+                        },
+                        {
+                          key: "page",
+                          value: "station",
+                        },
+                      ]);
                     }}
                   >
                     <span>查看站牌</span>
