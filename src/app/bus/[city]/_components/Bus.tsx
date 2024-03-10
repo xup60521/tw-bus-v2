@@ -2,7 +2,7 @@
 
 import { RNN } from "@/lib/utils";
 import type { BusEst, BusList, BusStops } from "@/type/busType";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -41,7 +41,8 @@ export default function Bus({
   const setURLSearchParams = useSetURLSearchParams();
   const searchParams = useSearchParams();
   const bus = searchParams.get("bus") ?? "";
-  const direction = searchParams.get("direction") ?? "";
+  // const direction = searchParams.get("direction") ?? "";
+  const [direction, setDirection] = useState(searchParams.get("direction") ?? "")
   const [open, setOpen] = useState(false);
   const busStops = useAtomValue(busStopsAtom);
   const busEst = useQuery({
@@ -66,12 +67,16 @@ export default function Bus({
     (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
   );
 
+  useEffect(()=>{
+    busEst.refetch()
+  },[bus])
+
   return (
     <>
       <div className="w-full h-full flex flex-col min-h-0">
-        <div className="w-full min-h-0 h-fit box-border border-b-[1px] border-white flex gap-1 items-center pb-1">
+        <div className="w-full box-border border-b-[1px] border-white flex gap-1 items-start pb-2 h-fit min-h-0">
           <button
-            className=" bg-transparent text-white h-8 py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all hover:bg-white hover:text-black"
+            className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all hover:bg-white hover:text-black"
             onClick={() => setOpen(true)}
           >
             {bus ? bus : "選擇公車"}
@@ -79,27 +84,28 @@ export default function Bus({
           {bus && (
             <>
               <button
-            onClick={add_remove_overlay}
-            className={`box-border flex px-2 h-8 py-2 items-center justify-center rounded-md border-[1px] text-white font-bold transition-all ${
-              isOverlayed
-                ? "border-red-300 text-red-300 hover:bg-red-300 hover:text-white"
-                : " border-white hover:bg-white hover:text-slate-700"
-            }`}
-          >
-            {isOverlayed ? <FiMinus /> : <FiPlus />}
-          </button>
+                onClick={add_remove_overlay}
+                className={`box-border flex px-2  py-2 items-center justify-center rounded-md border-[1px] text-white font-bold transition-all ${
+                  isOverlayed
+                    ? "border-red-300 text-red-300 hover:bg-red-300 hover:text-white"
+                    : " border-white hover:bg-white hover:text-slate-700"
+                }`}
+              >
+                {isOverlayed ? <FiMinus /> : <FiPlus />}
+              </button>
               <div
                 className={`w-full ${
                   isOneWay ? "" : "grid grid-cols-2 gap-1"
-                } relative py-1`}
+                } relative`}
               >
                 <button
-                  className={`h-8	 truncate rounded-md p-1 text-center border-[1px] font-semibold transition  border-white hover:bg-white hover:text-black ${
+                  className={`truncate min-h-full rounded-md py-1 text-center border-[1px] font-semibold transition  border-white hover:bg-white hover:text-black ${
                     isOneWay ? "w-full" : ""
                   } z-20 ${
                     direction === "0" ? "bg-white text-black" : "text-white"
                   }`}
                   onClick={() => {
+                    setDirection("0")
                     setURLSearchParams([{ key: "direction", value: "0" }]);
                   }}
                 >
@@ -109,10 +115,11 @@ export default function Bus({
                   ""
                 ) : (
                   <button
-                    className={`z-20 h-8 truncate rounded-md p-1 text-center font-semibold border-[1px] transition border-white hover:bg-white hover:text-black ${
+                    className={`z-20 truncate min-h-full rounded-md p-1 text-center font-semibold border-[1px] transition border-white hover:bg-white hover:text-black ${
                       direction === "1" ? "text-black bg-white" : "text-white"
                     }`}
                     onClick={() => {
+                      setDirection("1")
                       setURLSearchParams([{ key: "direction", value: "1" }]);
                     }}
                   >
@@ -123,6 +130,7 @@ export default function Bus({
             </>
           )}
         </div>
+        {/* {JSON.stringify(busEst.isPending)} */}
         <ScrollArea className="w-full h-full">
           <div className="flex w-full flex-col gap-1 py-[6px] pr-2">
             <StopList

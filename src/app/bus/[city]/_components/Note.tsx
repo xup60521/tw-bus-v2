@@ -8,12 +8,14 @@ const NoteCard: React.FC = () => {
   const [note, setNote] = useAtom(noteAtom);
 
   return (
-    <div className="w-full h-full rounded-lg md:opacity-90 bg-white text-black flex flex-col items-center pb-1 gap-1">
-      <h1 className="h-8 w-full p-1 text-center bg-slate-700 text-white font-bold md:rounded-t-lg">
-        筆記
-      </h1>
+    <div className="w-full h-full flex flex-col min-h-0">
+      <div className="w-full box-border border-b-[1px] border-white flex gap-1 pb-2 items-center h-fit min-h-0">
+        <span className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all">
+          Note
+        </span>
+      </div>
       <textarea
-        className="w-full h-full p-4 resize-none"
+        className="w-full h-full p-4 resize-none text-black rounded-md mt-2"
         value={note}
         onChange={(e) => setNote(e.target.value)}
       />

@@ -41,6 +41,7 @@ export default function ShowMarker({
       icon={station === item.StopName.Zh_tw ? icon_blue : icon}
       key={`${item.StopSequence}`}
       position={[item.StopPosition.PositionLat, item.StopPosition.PositionLon]}
+      zIndexOffset={station === item.StopName.Zh_tw ? 500 : undefined}
     >
       <Popup>
         <div>

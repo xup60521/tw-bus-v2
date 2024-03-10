@@ -13,16 +13,19 @@ import Overlay from "./Overlay";
 import type { BusList } from "@/type/busType";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import ReactQuery from "./ReactQueryClient";
+import { useEffect, useState } from "react";
+import { getAllBus } from "@/server_action/getAllBus";
 
-export default function Nav({
-  city,
-  initBusList,
-}: {
-  city: string;
-  initBusList: BusList[];
-}) {
+export default function Nav({ city }: { city: string }) {
   const searchParams = useSearchParams();
   const page = searchParams.get("page") ?? "bus";
+  const [initBusList, setInitBusList] = useState<BusList[]>([])
+  useEffect(() => {
+    getAllBus(city).then((res: BusList[])=>{
+      setInitBusList([...res])
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <ReactQuery>
       {page === "bus" && <Bus city={city} initBusList={initBusList} />}

@@ -25,7 +25,7 @@ export default function Overlay() {
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
-      <div className="w-full box-border p-1 border-b-[1px] border-white flex gap-1 items-center h-12 min-h-0">
+      <div className="w-full box-border border-b-[1px] border-white flex gap-1 pb-2 items-center h-fit min-h-0">
         <span className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all">
           Overlay
         </span>

@@ -47,7 +47,7 @@ export default function Station({ city }: { city: string }) {
   return (
     <>
       <div className="w-full h-full flex flex-col min-h-0">
-        <div className="w-full box-border p-1 border-b-[1px] border-white flex gap-1 items-center h-12 min-h-0">
+        <div className="w-full box-border border-b-[1px] border-white flex gap-1 items-start pb-2 h-fit min-h-0">
           <button
             onClick={() => setOpen(true)}
             className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all hover:bg-white hover:text-black "
@@ -132,10 +132,12 @@ function PopupSetStation({
                     <div
                       onClick={() => {
                         setOpen(false);
-                        setURLSearchParams([{
-                          key: "station",
-                          value: item,
-                        }]);
+                        setURLSearchParams([
+                          {
+                            key: "station",
+                            value: item,
+                          },
+                        ]);
                         // setStation(item);
                         // router.push(`?bus=${bus}&direction=${direction}&station=${item}`)
                       }}
@@ -199,16 +201,19 @@ const BusList = ({
                 />
                 <button
                   onClick={() => {
-                    setURLSearchParams([{
-                      key: "bus",
-                      value: item.RouteName.Zh_tw,
-                    },{
-                      key: "direction",
-                      value: String(
-                        item.Direction === 255 ? 0 : item.Direction
-                      ),
-                    }]);
-                    
+                    setURLSearchParams([
+                      {
+                        key: "bus",
+                        value: item.RouteName.Zh_tw,
+                      },
+                      {
+                        key: "direction",
+                        value: String(
+                          item.Direction === 255 ? 0 : item.Direction
+                        ),
+                      },
+                    ]);
+
                     // setBus(item.RouteName.Zh_tw);
                     // setDirection(
                     //   String(item.Direction === 255 ? 0 : item.Direction)
@@ -242,19 +247,23 @@ const BusList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
-                      setURLSearchParams([{
-                        key: "bus",
-                        value: item.RouteName.Zh_tw,
-                      },{
-                        key: "direction",
-                        value: String(
-                          item.Direction === 255 ? 0 : item.Direction
-                        ),
-                      },{
-                        key: "page",
-                        value: "bus",
-                      }]);
-                      
+                      setURLSearchParams([
+                        {
+                          key: "bus",
+                          value: item.RouteName.Zh_tw,
+                        },
+                        {
+                          key: "direction",
+                          value: String(
+                            item.Direction === 255 ? 0 : item.Direction
+                          ),
+                        },
+                        {
+                          key: "page",
+                          value: "bus",
+                        },
+                      ]);
+
                       //   setDirection(
                       //     String(item.Direction === 255 ? 0 : item.Direction)
                       //   );
