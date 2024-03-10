@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { getBusEst } from "@/server_action/getBusEst";
 import { useAtomValue, useSetAtom } from "jotai";
-import { busStopsAtom, overlayAtom, toggleStopAtom } from "@/state/busState";
+import { busStopsAtom, overlayAtom, pageAtom, toggleStopAtom } from "@/state/busState";
 import { useQuery } from "@tanstack/react-query";
 import {
   DropdownMenu,
@@ -173,7 +173,6 @@ function DrawerSection({
   const [qString, setQString] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-
   if (!Array.isArray(initBusList)) {
     return null;
   }
@@ -294,6 +293,7 @@ const StopList = ({
 }) => {
   const setToggleStop = useSetAtom(toggleStopAtom);
   const station = searchParams.get("station") ?? "";
+  const setPage = useSetAtom(pageAtom)
   if (!list) {
     return "";
   }
@@ -347,6 +347,7 @@ const StopList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
+                      setPage("station")
                       setURLSearchParams([
                         {
                           key: "station",

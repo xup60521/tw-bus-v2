@@ -15,7 +15,7 @@ import { FaTrash } from "react-icons/fa6";
 import { FiMenu } from "react-icons/fi";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter, useSearchParams } from "next/navigation";
-import { overlayAtom, togglePolylineAtom } from "@/state/busState";
+import { overlayAtom, pageAtom, togglePolylineAtom } from "@/state/busState";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 
 export default function Overlay() {
@@ -55,6 +55,7 @@ const OverlayList = ({
   const setURLSearchParams = useSetURLSearchParams();
   const { toast } = useToast();
   const setTogglePolyline = useSetAtom(togglePolylineAtom);
+  const setPage = useSetAtom(pageAtom)
 
   const handleRemove = (name: string, direction: number, headSign: string) => {
     setBusOverlay((prev) => {
@@ -124,6 +125,7 @@ const OverlayList = ({
                       //   router.push(
                       //     `?bus=${item.RouteName.Zh_tw}&direction=${item.Direction}&station=${station}`
                       //   );
+                      setPage("bus")
                       setURLSearchParams([
                         {
                           key: "bus",

@@ -15,23 +15,39 @@ import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import ReactQuery from "./ReactQueryClient";
 import { useEffect, useState } from "react";
 import { getAllBus } from "@/server_action/getAllBus";
+import { useHydrateAtoms } from "jotai/utils";
+import { pageAtom } from "@/state/busState";
+import { useAtom, useAtomValue } from "jotai";
 
 export default function Nav({ city }: { city: string }) {
   const searchParams = useSearchParams();
-  const page = searchParams.get("page") ?? "bus";
-  const [initBusList, setInitBusList] = useState<BusList[]>([])
+  useHydrateAtoms([[pageAtom, searchParams.get("page") ?? "bus"]]);
+  const page = useAtomValue(pageAtom);
+  const [initBusList, setInitBusList] = useState<BusList[]>([]);
   useEffect(() => {
-    getAllBus(city).then((res: BusList[])=>{
-      setInitBusList([...res])
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    getAllBus(city).then((res: BusList[]) => {
+      setInitBusList([...res]);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <ReactQuery>
-      {page === "bus" && <Bus city={city} initBusList={initBusList} />}
-      {page === "station" && <Station city={city} />}
+      {/* {page === "bus" &&}
+      {page === "station" &&}
       {page === "note" && <Note />}
-      {page === "overlay" && <Overlay />}
+      {page === "overlay" && <Overlay />} */}
+      {(() => {
+        if (page === "station") {
+          return <Station city={city} />;
+        }
+        if (page === "note") {
+          return <Note />;
+        }
+        if (page === "overlay") {
+          return <Overlay />;
+        }
+        return <Bus city={city} initBusList={initBusList} />;
+      })()}
       <Controller searchParams={searchParams} />
     </ReactQuery>
   );
@@ -42,32 +58,44 @@ const Controller = ({
 }: {
   searchParams: ReadonlyURLSearchParams;
 }) => {
-  const page = searchParams.get("page") ?? "bus";
+  const [page, setPage] = useAtom(pageAtom)
   const setURLSearchParams = useSetURLSearchParams();
 
   return (
     <div className="absolute left-[50vw] top-2 box-border flex h-8 -translate-x-[50%] rounded-xl bg-white text-sm text-black md:top-[calc(100vh-2.5rem)] z-10">
       <button
         className="z-20 h-8 w-12 text-center font-bold"
-        onClick={() => setURLSearchParams([{ key: "page", value: "bus" }])}
+        onClick={() => {
+          setPage("bus")
+          setURLSearchParams([{ key: "page", value: "bus" }]);
+        }}
       >
         公車
       </button>
       <button
         className="z-20 h-8 w-12 text-center font-bold"
-        onClick={() => setURLSearchParams([{ key: "page", value: "station" }])}
+        onClick={() => {
+          setPage("station")
+          setURLSearchParams([{ key: "page", value: "station" }]);
+        }}
       >
         站牌
       </button>
       <button
         className="z-20 h-8 w-12 text-center font-bold"
-        onClick={() => setURLSearchParams([{ key: "page", value: "note" }])}
+        onClick={() => {
+          setPage("note")
+          setURLSearchParams([{ key: "page", value: "note" }]);
+        }}
       >
         筆記
       </button>
       <button
         className="z-20 h-8 w-12 text-center font-bold"
-        onClick={() => setURLSearchParams([{ key: "page", value: "overlay" }])}
+        onClick={() => {
+          setPage("overlay")
+          setURLSearchParams([{ key: "page", value: "overlay" }]);
+        }}
       >
         疊加
       </button>

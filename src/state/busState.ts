@@ -15,3 +15,4 @@ export const toggleStopAtom = atom<{
   }>({ routeName: undefined, id: 0, direction: undefined });
   export const overlayAtom = atom<BusOverlay[]>([]);
   export const noteAtom = atomWithStorage("note", "")
+  export const pageAtom = atom("")

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { searchStop } from "@/server_action/searchStop";
-import { overlayAtom } from "@/state/busState";
+import { overlayAtom, pageAtom } from "@/state/busState";
 import type { BusRoutePassBy, BusStopSearchResult } from "@/type/busType";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Popup from "reactjs-popup";
@@ -175,7 +175,7 @@ const BusList = ({
   const busOverlay = useAtomValue(overlayAtom);
   const add_remove_overlay = useOverlay();
   const setURLSearchParams = useSetURLSearchParams();
-
+  const setPage = useSetAtom(pageAtom)
   return (
     <>
       {list
@@ -201,6 +201,7 @@ const BusList = ({
                 />
                 <button
                   onClick={() => {
+                    
                     setURLSearchParams([
                       {
                         key: "bus",
@@ -247,6 +248,7 @@ const BusList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
+                      setPage("bus")
                       setURLSearchParams([
                         {
                           key: "bus",
