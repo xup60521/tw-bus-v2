@@ -32,10 +32,6 @@ export default function Nav({ city }: { city: string }) {
   }, []);
   return (
     <ReactQuery>
-      {/* {page === "bus" &&}
-      {page === "station" &&}
-      {page === "note" && <Note />}
-      {page === "overlay" && <Overlay />} */}
       {(() => {
         if (page === "station") {
           return <Station city={city} />;

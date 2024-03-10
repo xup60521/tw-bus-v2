@@ -20,7 +20,12 @@ import { Button } from "@/components/ui/button";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { getBusEst } from "@/server_action/getBusEst";
 import { useAtomValue, useSetAtom } from "jotai";
-import { busStopsAtom, overlayAtom, pageAtom, toggleStopAtom } from "@/state/busState";
+import {
+  busStopsAtom,
+  overlayAtom,
+  pageAtom,
+  toggleStopAtom,
+} from "@/state/busState";
 import { useQuery } from "@tanstack/react-query";
 import {
   DropdownMenu,
@@ -30,6 +35,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FiMenu, FiMinus, FiPlus } from "react-icons/fi";
 import { useOverlay } from "@/hooks/useOverlay";
+import { useSeparateStops } from "@/hooks/useSeparateStops";
+import RemainningTime from "./RemainningTime";
 
 export default function Bus({
   city,
@@ -42,7 +49,9 @@ export default function Bus({
   const searchParams = useSearchParams();
   const bus = searchParams.get("bus") ?? "";
   // const direction = searchParams.get("direction") ?? "";
-  const [direction, setDirection] = useState(searchParams.get("direction") ?? "")
+  const [direction, setDirection] = useState(
+    searchParams.get("direction") ?? ""
+  );
   const [open, setOpen] = useState(false);
   const busStops = useAtomValue(busStopsAtom);
   const busEst = useQuery({
@@ -51,25 +60,25 @@ export default function Bus({
     enabled: !!bus,
     refetchInterval: 15000,
   });
-  const busStops0 = busStops?.find((item) => item.Direction === 0)?.Stops;
-  const headto0 = busStops0?.sort((a, b) => b.StopSequence - a.StopSequence)[0]
-    ?.StopName.Zh_tw;
-  const busStops1 = busStops?.find((item) => item.Direction === 1)?.Stops;
-  const headto1 = busStops1?.sort((a, b) => b.StopSequence - a.StopSequence)[0]
-    ?.StopName.Zh_tw;
-  const direction0 = busEst.data?.filter((item) => item.Direction === 0);
-  const direction1 = busEst.data?.filter((item) => item.Direction === 1);
-  const isOneWay =
-    (busStops0?.length ?? 0) > 0 && (busStops1?.length ?? 0) > 0 ? false : true;
+
+  const {
+    busStops0,
+    headto0,
+    busStops1,
+    headto1,
+    direction0,
+    direction1,
+    isOneWay,
+  } = useSeparateStops(busStops, busEst.data);
   const add_remove_overlay = useOverlay();
   const busOverlay = useAtomValue(overlayAtom);
   const isOverlayed = !!busOverlay.find(
     (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
   );
 
-  useEffect(()=>{
-    busEst.refetch()
-  },[bus])
+  useEffect(() => {
+    busEst.refetch();
+  }, [bus]);
 
   return (
     <>
@@ -105,7 +114,7 @@ export default function Bus({
                     direction === "0" ? "bg-white text-black" : "text-white"
                   }`}
                   onClick={() => {
-                    setDirection("0")
+                    setDirection("0");
                     setURLSearchParams([{ key: "direction", value: "0" }]);
                   }}
                 >
@@ -119,7 +128,7 @@ export default function Bus({
                       direction === "1" ? "text-black bg-white" : "text-white"
                     }`}
                     onClick={() => {
-                      setDirection("1")
+                      setDirection("1");
                       setURLSearchParams([{ key: "direction", value: "1" }]);
                     }}
                   >
@@ -293,7 +302,7 @@ const StopList = ({
 }) => {
   const setToggleStop = useSetAtom(toggleStopAtom);
   const station = searchParams.get("station") ?? "";
-  const setPage = useSetAtom(pageAtom)
+  const setPage = useSetAtom(pageAtom);
   if (!list) {
     return "";
   }
@@ -316,7 +325,6 @@ const StopList = ({
                 <RemainningTime
                   EstimateTime={g?.EstimateTime}
                   NextBusTime={g?.NextBusTime}
-                  isLoading={isLoading}
                 />
                 <button
                   onClick={() => {
@@ -347,7 +355,7 @@ const StopList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
-                      setPage("station")
+                      setPage("station");
                       setURLSearchParams([
                         {
                           key: "station",
@@ -371,57 +379,4 @@ const StopList = ({
   );
 };
 
-const RemainningTime = ({
-  EstimateTime,
-  NextBusTime,
-  isLoading,
-}: {
-  EstimateTime: BusEst["EstimateTime"];
-  NextBusTime: BusEst["NextBusTime"];
-  isLoading: boolean;
-}) => {
-  const min = Math.floor(Number(EstimateTime ?? 0) / 60);
-  const color =
-    min > 5 ? "bg-slate-100 text-slate-600" : "bg-red-200 text-red-900";
-  if (isLoading) {
-    return (
-      <div className="w-20 rounded-md border-[1px] border-slate-100 p-1 py-[0.125rem] text-center text-white">
-        Loading...
-      </div>
-    );
-  }
-  if (EstimateTime) {
-    return (
-      <div className={`h-full w-20 rounded p-1 text-center ${color}`}>
-        {`${min}`.padEnd(3, " ")}分鐘
-      </div>
-    );
-  }
 
-  if (EstimateTime === 0) {
-    return (
-      <div className={`h-full w-20 rounded p-1 text-center ${color}`}>
-        進站中
-      </div>
-    );
-  }
-
-  if (!EstimateTime && NextBusTime) {
-    const date = new Date(NextBusTime);
-    const time = `${date.getHours()}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
-
-    return (
-      <div className="w-20 rounded-md border-[1px] border-slate-100 p-1 py-[0.125rem] text-center text-slate-700">
-        {time}
-      </div>
-    );
-  }
-  return (
-    <div className="w-20 rounded-md border-[1px] border-slate-100 p-1 py-[0.125rem] text-center text-white">
-      末班駛離
-    </div>
-  );
-};

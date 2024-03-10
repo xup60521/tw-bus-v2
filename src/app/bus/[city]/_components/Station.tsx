@@ -5,9 +5,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { searchStop } from "@/server_action/searchStop";
 import { overlayAtom, pageAtom } from "@/state/busState";
 import type { BusRoutePassBy, BusStopSearchResult } from "@/type/busType";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import Popup from "reactjs-popup";
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaSpinner } from "react-icons/fa6";
 import { Input } from "@/components/ui/input";
@@ -18,14 +18,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RNN } from "@/lib/utils";
-import { SetAtom } from "@/type/setAtom";
 import { FiMenu } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { getRoutePassBy } from "@/server_action/getRoutePassby";
 import { useOverlay } from "@/hooks/useOverlay";
-import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
+import RemainningTime from "./RemainningTime";
 
 export default function Station({ city }: { city: string }) {
   const [open, setOpen] = useState(false);
@@ -60,7 +59,6 @@ export default function Station({ city }: { city: string }) {
             <BusList
               bus={bus}
               direction={direction}
-              //   setPage={setPage}
               list={data.data}
             />
           </div>
@@ -138,8 +136,6 @@ function PopupSetStation({
                             value: item,
                           },
                         ]);
-                        // setStation(item);
-                        // router.push(`?bus=${bus}&direction=${direction}&station=${item}`)
                       }}
                       key={`${item}`}
                       className="rounded-md p-2 py-3 transition-all hover:cursor-pointer hover:bg-slate-100"
@@ -161,14 +157,10 @@ function PopupSetStation({
 
 const BusList = ({
   list,
-  //   setBus,
-  //   setDirection,
   bus,
   direction,
 }: {
   list?: BusRoutePassBy[];
-  //   setBus: SetAtom<[SetStateAction<string>], void>;
-  //   setDirection: SetAtom<[SetStateAction<string>], void>;
   bus: string;
   direction: string;
 }) => {
@@ -214,11 +206,6 @@ const BusList = ({
                         ),
                       },
                     ]);
-
-                    // setBus(item.RouteName.Zh_tw);
-                    // setDirection(
-                    //   String(item.Direction === 255 ? 0 : item.Direction)
-                    // );
                   }}
                   className="relative group"
                 >
@@ -265,11 +252,6 @@ const BusList = ({
                           value: "bus",
                         },
                       ]);
-
-                      //   setDirection(
-                      //     String(item.Direction === 255 ? 0 : item.Direction)
-                      //   );
-                      //   setBus(item.RouteName.Zh_tw);
                     }}
                   >
                     <span>查看路線</span>
@@ -291,48 +273,3 @@ const BusList = ({
   );
 };
 
-const RemainningTime = ({
-  EstimateTime,
-  NextBusTime,
-}: {
-  EstimateTime: BusRoutePassBy["EstimateTime"];
-  NextBusTime: BusRoutePassBy["NextBusTime"];
-}) => {
-  const min = Math.floor(Number(EstimateTime ?? 0) / 60);
-  const color =
-    min > 5 ? "bg-slate-100 text-slate-600" : "bg-red-200 text-red-900";
-  if (EstimateTime) {
-    return (
-      <div className={`w-20 p-1 text-center h-full rounded ${color}`}>
-        {`${min}`.padEnd(3, " ")}分鐘
-      </div>
-    );
-  }
-
-  if (EstimateTime === 0) {
-    return (
-      <div className={`w-20 p-1 text-center h-full rounded ${color}`}>
-        進站中
-      </div>
-    );
-  }
-
-  if (!EstimateTime && NextBusTime) {
-    const date = new Date(NextBusTime);
-    const time = `${date.getHours()}:${date
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
-
-    return (
-      <div className="w-20 p-1 py-[0.125rem] text-center rounded-md border-slate-100 border-[1px] text-slate-700">
-        {time}
-      </div>
-    );
-  }
-  return (
-    <div className="w-20 rounded-md border-[1px] border-slate-100 p-1 py-[0.125rem] text-center text-white">
-      末班駛離
-    </div>
-  );
-};
