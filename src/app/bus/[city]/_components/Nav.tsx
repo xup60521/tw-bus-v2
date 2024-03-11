@@ -1,10 +1,7 @@
 "use client";
 
-import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
-  type ReadonlyURLSearchParams,
   useSearchParams,
-  useRouter,
 } from "next/navigation";
 import Bus from "./Bus";
 import Station from "./Station";
@@ -16,13 +13,18 @@ import ReactQuery from "./ReactQueryClient";
 import { useEffect, useState } from "react";
 import { getAllBus } from "@/server_action/getAllBus";
 import { useHydrateAtoms } from "jotai/utils";
-import { pageAtom } from "@/state/busState";
-import { useAtom, useAtomValue } from "jotai";
+import { busShapeAtom, busStopsAtom, pageAtom } from "@/state/busState";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { getBusStops } from "@/server_action/getBusStops";
+import { getBusShape } from "@/server_action/getBusShape";
 
 export default function Nav({ city }: { city: string }) {
   const searchParams = useSearchParams();
   useHydrateAtoms([[pageAtom, searchParams.get("page") ?? "bus"]]);
   const page = useAtomValue(pageAtom);
+  const setBusShape = useSetAtom(busShapeAtom)
+  const setBusStops = useSetAtom(busStopsAtom)
+  const bus = searchParams.get("bus") ?? ""
   const [initBusList, setInitBusList] = useState<BusList[]>([]);
   useEffect(() => {
     getAllBus(city).then((res: BusList[]) => {
@@ -30,6 +32,64 @@ export default function Nav({ city }: { city: string }) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    if (bus) {
+      getBusStops(bus, city)
+        .then((stops) => {
+          setBusStops([...stops]);
+          getBusShape(bus, city)
+            .then((shapes) => {
+              const withDirectionData = shapes
+                .map((item, index, arr) => {
+                  const d0 = stops
+                    .find((d) => d.Direction === 0)
+                    ?.Stops.sort(
+                      (a, b) => a.StopSequence - b.StopSequence
+                    )[0].StopPosition;
+                  const d1 = stops
+                    .find((d) => d.Direction === 1)
+                    ?.Stops.sort(
+                      (a, b) => a.StopSequence - b.StopSequence
+                    )[0].StopPosition;
+                  if (item.Direction) {
+                    return item;
+                  } else if (arr.length === 2 && d0 && d1) {
+                    const regex = /[A-Z()]/g;
+                    const position = item.Geometry.replace(regex, "")
+                      .split(",")
+                      .map((f) =>
+                        f
+                          .split(" ")
+                          .reverse()
+                          .map((item) => Number(item))
+                      )[0] as [number, number];
+                    const length_to_d0 =
+                      (position[0] - d0.PositionLat) ** 2 +
+                      (position[1] - d0.PositionLon) ** 2;
+                    const length_to_d1 =
+                      (position[0] - d1.PositionLat) ** 2 +
+                      (position[1] - d1.PositionLon) ** 2;
+                    if (length_to_d0 >= length_to_d1) {
+                      item.Direction = 1;
+                    } else {
+                      item.Direction = 0;
+                    }
+
+                    return item;
+                  } else {
+                    item.Direction = index;
+                    return item;
+                  }
+                })
+                .sort((a, b) => a.Direction - b.Direction);
+              setBusShape([...withDirectionData]);
+            })
+            .catch((shapErr) => alert(shapErr));
+        })
+        .catch((StopsErr) => alert(StopsErr));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bus]);
   return (
     <ReactQuery>
       {(() => {
@@ -44,16 +104,12 @@ export default function Nav({ city }: { city: string }) {
         }
         return <Bus city={city} initBusList={initBusList} />;
       })()}
-      <Controller searchParams={searchParams} />
+      <Controller />
     </ReactQuery>
   );
 }
 
-const Controller = ({
-  searchParams,
-}: {
-  searchParams: ReadonlyURLSearchParams;
-}) => {
+const Controller = () => {
   const [page, setPage] = useAtom(pageAtom)
   const setURLSearchParams = useSetURLSearchParams();
 
