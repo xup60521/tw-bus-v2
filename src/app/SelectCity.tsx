@@ -32,7 +32,7 @@ export default function SelectCity(): React.ReactNode {
   return (
     <section
       id="start"
-      className="flex h-screen w-screen flex-col items-center justify-start gap-4 pt-[10vh] bg-slate-700"
+      className="flex h-screen w-screen flex-col items-center justify-start gap-4 pt-[10vh] bg-slate-700 text-white"
     >
       <h2 className="font-mono text-3xl">Select a city</h2>
       <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">

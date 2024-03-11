@@ -11,7 +11,7 @@ export default function Home() {
         <nav className="absolute left-0 top-0 flex w-screen items-center justify-between p-8">
           <span className="flex h-full items-center gap-4">
             <Image src="/icon_white.png" height={20} width={20} alt="icon" />
-            <span className="font-mono text-xl">T3 Taiwan Bus</span>
+            <span className="font-mono text-xl">台灣等公車</span>
           </span>
           <a
             href={"https://github.com/xup60521/t3-taiwan-bus"}
@@ -43,21 +43,7 @@ export default function Home() {
         </a>
       </section>
       <SelectCity />
-      {/* <ListItems list={list} /> */}
     </main>
   );
 }
 
-// function ListItems({ list }: { list: string[] }) {
-//   return (
-//     <div className="grid h-[70vh] w-full grid-cols-2 items-center">
-//       {list.map((item) => {
-//         return (
-//           <div key={item} className="text-center">
-//             <Link href={`/bus?city=${item}`}>{item}</Link>
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// }
