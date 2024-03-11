@@ -251,23 +251,44 @@ const ShowOverlayStops = ({
     <>
       {flatNameWithRouteList.map((data) => {
         const item = flatall.find((d) => d.StopName.Zh_tw === data.name);
-        const color = getColor(data.passby[0]);
-        const markerHtmlStyles = `
-  background-color: white;
-  width:  1rem;
-  height: 1rem;
-  display: block;
-  left: -0.5rem;
-  bottom: -0.7rem;
-  position: relative;
-  border-radius: 0.5rem;
-  transform: rotate(45deg);
-  border: 0.15rem solid ${color}`;
+        // let h = `<span style="display: block;width:fit-content;
+        // border-radius: 100%;border: 0.25rem solid blue;"><span style="display: block;
+        // border-radius: 100%;background-color: white;
+        // width:  1rem;
+        // height: 1rem;
+        // position: relative;
+        // border: 0.25rem solid red;">
+        // </span></span>`
+        let h = ""
+        data.passby.forEach((item, index, arr) => {
+          const color = getColor(item);
+          if (index === 0) {
+            h = `<span style="display: block;
+            border-radius: 100%;background-color: white;
+            width:  1rem;
+            height: 1rem;
+            position: relative;
+            border: 0.25rem solid ${color};"></span>`
+          } else {
+            h = `<span style="display: block;width:fit-content;
+            border-radius: 100%;border: 0.25rem solid ${color};">${h}</span>`
+          }
+        })
+  //       const markerHtmlStyles = `
+  // background-color: white;
+  // width:  1rem;
+  // height: 1rem;
+  // display: block;
+  // left: -0.5rem;
+  // bottom: -0.7rem;
+  // position: relative;
+  // border-radius: 0.5rem;
+  // border: 0.15rem solid ${color}`;
         const icon = new DivIcon({
           className: "my-custom-pin",
-          iconAnchor: [0, 24],
+          iconAnchor: [10, 6],
           popupAnchor: [0, -12],
-          html: `<span style="${markerHtmlStyles}" />`,
+          html: h,
         });
         return (
           <>

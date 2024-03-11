@@ -156,6 +156,7 @@ export default function Bus({
       <DrawerSection
         initBusList={initBusList}
         open={open}
+        setDirection={setDirection}
         setOpen={setOpen}
         setURLSearchParams={setURLSearchParams}
         bus={bus}
@@ -170,12 +171,14 @@ function DrawerSection({
   open,
   setOpen,
   bus,
+  setDirection,
   setURLSearchParams,
 }: {
   initBusList: BusList[];
   open: boolean;
   bus: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDirection: React.Dispatch<React.SetStateAction<string>>;
   setURLSearchParams: (prop: SetURLSearchParamsInputProps[]) => void;
   // setBus: SetAtom<[SetStateAction<string>], void>;
   // setDirection: SetAtom<[SetStateAction<string>], void>;
@@ -258,6 +261,7 @@ function DrawerSection({
                         onClick={() => {
                           closeBtnRef.current?.click();
                           setQString("");
+                          setDirection("0")
                           setURLSearchParams([
                             {
                               key: "bus",
