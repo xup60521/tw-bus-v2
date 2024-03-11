@@ -26,6 +26,7 @@ export default function Nav({ city }: { city: string }) {
   const setBusStops = useSetAtom(busStopsAtom)
   const bus = searchParams.get("bus") ?? ""
   const [initBusList, setInitBusList] = useState<BusList[]>([]);
+  
   useEffect(() => {
     getAllBus(city).then((res: BusList[]) => {
       setInitBusList([...res]);

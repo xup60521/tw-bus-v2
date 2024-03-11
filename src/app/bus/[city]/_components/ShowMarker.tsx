@@ -1,6 +1,6 @@
 "use client";
 
-import { Icon } from "leaflet";
+import { Icon, DivIcon } from "leaflet";
 import type L from "leaflet";
 import { useEffect, useRef } from "react";
 import { Marker, Popup, Tooltip } from "react-leaflet";
@@ -11,19 +11,26 @@ import { toggleStopAtom } from "@/state/busState";
 
 export default function ShowMarker({
   item,
-  station
+  currentStation,
+  icon,
+  tooltipDisplay
 }: {
   item: Unpacked<BusStops["Stops"]>;
-  station: string;
+  currentStation: string;
+  icon?: L.Icon | L.DivIcon;
+  tooltipDisplay?: {
+    display: boolean;
+    text: string;
+  }
 }) {
   const ref = useRef<L.Marker>(null);
   const toggleStop = useAtomValue(toggleStopAtom)
-  const icon = new Icon({
+  const pin_inv = new Icon({
     iconUrl: "/pin_inv.png",
     iconSize: [16, 48],
   });
-  const icon_blue = new Icon({
-    iconUrl: "/pin_blue.png",
+  const icon_red = new Icon({
+    iconUrl: "/pin_red.png", 
     iconSize: [32, 96],
   });
 
@@ -38,19 +45,19 @@ export default function ShowMarker({
     <Marker
       ref={ref}
       riseOffset={-12}
-      icon={station === item.StopName.Zh_tw ? icon_blue : icon}
+      icon={icon ? icon : (currentStation === item.StopName.Zh_tw ? icon_red : pin_inv)}
       key={`${item.StopSequence}`}
       position={[item.StopPosition.PositionLat, item.StopPosition.PositionLon]}
-      zIndexOffset={station === item.StopName.Zh_tw ? 500 : undefined}
+      zIndexOffset={currentStation === item.StopName.Zh_tw ? -500 : undefined}
     >
       <Popup>
         <div>
           <p>{`${item.StopSequence} ${item.StopName.Zh_tw}`}</p>
         </div>
       </Popup>
-      <Tooltip permanent direction="bottom">
+      <Tooltip permanent={tooltipDisplay ? tooltipDisplay.display : true} direction="bottom">
         <div>
-          <p>{`${item.StopSequence}`}</p>
+          <p>{`${tooltipDisplay ? tooltipDisplay.text :item.StopSequence}`}</p>
         </div>
       </Tooltip>
     </Marker>

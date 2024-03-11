@@ -37,6 +37,8 @@ import { FiMenu, FiMinus, FiPlus } from "react-icons/fi";
 import { useOverlay } from "@/hooks/useOverlay";
 import { useSeparateStops } from "@/hooks/useSeparateStops";
 import RemainningTime from "./RemainningTime";
+import { FaInfo } from "react-icons/fa6";
+import Popup from "reactjs-popup";
 
 export default function Bus({
   city,
@@ -147,7 +149,6 @@ export default function Bus({
               stops={direction === "0" ? busStops0 : busStops1}
               setURLSearchParams={setURLSearchParams}
               searchParams={searchParams}
-              isLoading={busEst.isLoading}
             />
           </div>
         </ScrollArea>
@@ -157,7 +158,9 @@ export default function Bus({
         open={open}
         setOpen={setOpen}
         setURLSearchParams={setURLSearchParams}
+        bus={bus}
       />
+      
     </>
   );
 }
@@ -166,13 +169,12 @@ function DrawerSection({
   initBusList,
   open,
   setOpen,
-  // setBus,
-  // setDirection,
-  // router,
+  bus,
   setURLSearchParams,
 }: {
   initBusList: BusList[];
   open: boolean;
+  bus: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setURLSearchParams: (prop: SetURLSearchParamsInputProps[]) => void;
   // setBus: SetAtom<[SetStateAction<string>], void>;
@@ -182,6 +184,7 @@ function DrawerSection({
   const [qString, setQString] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const [openPopup, setOpenPopup] = useState(false)
   if (!Array.isArray(initBusList)) {
     return null;
   }
@@ -214,7 +217,18 @@ function DrawerSection({
           onEscapeKeyDown={() => setOpen(false)}
         >
           <DrawerHeader>
-            <DrawerTitle>選擇公車</DrawerTitle>
+            <DrawerTitle asChild>
+              <div className="flex justify-between items-center">
+                <p>選擇公車</p>
+                {bus ? <div className="flex gap-2 items-center">
+                  <p>{bus}</p>
+                  <button onClick={()=>{
+                    closeBtnRef.current?.click()
+                    setOpenPopup(true)
+                  }} className=" text-xs border-2 transition-all hover:bg-slate-700 hover:text-white rounded border-slate-700 p-1"><FaInfo /></button>
+                </div> : null}
+              </div>
+            </DrawerTitle>
           </DrawerHeader>
           <DrawerFooter className="flex flex-col items-center">
             <Input
@@ -283,19 +297,18 @@ function DrawerSection({
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      <PopupSection openPopup={openPopup} setOpenPopup={setOpenPopup} bus={bus} />
     </>
   );
 }
 
 const StopList = ({
-  isLoading,
   list,
   stops,
   setURLSearchParams,
   searchParams,
 }: {
   list?: BusEst[];
-  isLoading: boolean;
   stops?: BusStops["Stops"];
   setURLSearchParams: (prop: SetURLSearchParamsInputProps[]) => void;
   searchParams: ReadonlyURLSearchParams;
@@ -379,4 +392,18 @@ const StopList = ({
   );
 };
 
-
+const PopupSection = ({
+  openPopup,
+  setOpenPopup,
+  bus
+}:{
+  openPopup: boolean;
+  setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>;
+  bus: string;
+}) => {
+  return <Popup open={openPopup} onClose={()=>setOpenPopup(false)}>
+    <div className="w-[90vw] max-w-[50rem] h-[90vh] max-h-[50rem] bg-white rounded-lg flex flex-col">
+      <h3 className="w-full p-2 text-lg">{bus}</h3>
+    </div>
+  </Popup>
+}

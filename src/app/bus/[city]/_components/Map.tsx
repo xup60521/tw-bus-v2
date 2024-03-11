@@ -9,7 +9,7 @@ import {
   Tooltip,
   useMap,
 } from "react-leaflet";
-import seedrandom from "seedrandom"
+import seedrandom from "seedrandom";
 import "leaflet/dist/leaflet.css";
 import { useSearchParams } from "next/navigation";
 import { getBusStops } from "@/server_action/getBusStops";
@@ -19,7 +19,8 @@ import { getBusShape } from "@/server_action/getBusShape";
 import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
 import ShowMarker from "./ShowMarker";
 import ShowPolyline from "./ShowPolyline";
-import { Icon } from "leaflet";
+import { DivIcon, Icon } from "leaflet";
+import { useOverlayColor } from "@/hooks/useOverlayColor";
 
 export default function Map({ city }: { city: string }) {
   const position = useMemo(
@@ -27,14 +28,13 @@ export default function Map({ city }: { city: string }) {
     []
   );
   const searchParams = useSearchParams();
-  const bus = searchParams.get("bus") ?? ""
-  const direction = searchParams.get("direction") ?? ""
-  const station = searchParams.get("station") ?? ""
+  const bus = searchParams.get("bus") ?? "";
+  const direction = searchParams.get("direction") ?? "";
+  const station = searchParams.get("station") ?? "";
   const busShape = useAtomValue(busShapeAtom);
   const busStops = useAtomValue(busStopsAtom);
-  const busOverlay = useAtomValue(overlayAtom)
+  const busOverlay = useAtomValue(overlayAtom);
 
-  
   return (
     <>
       <MapContainer
@@ -48,19 +48,24 @@ export default function Map({ city }: { city: string }) {
           url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
         />
         <FlyToCurrent />
-        <ShowPolyLines 
-      bus={bus} 
-      direction={direction} 
-      busShape={busShape} 
-      busStops={busStops} 
-      /> 
-      <ShowOverlayPolylines 
-      bus={bus} 
-      direction={direction} 
-      busOverlay={busOverlay} 
-      /> 
-      <ShowStops bus={bus} direction={direction} busStops={busStops} station={station} /> 
-    <ShowOverlayStops busOverlay={busOverlay} /> 
+        <ShowPolyLines
+          bus={bus}
+          direction={direction}
+          busShape={busShape}
+          busStops={busStops}
+        />
+        <ShowOverlayPolylines
+          bus={bus}
+          direction={direction}
+          busOverlay={busOverlay}
+        />
+        <ShowStops
+          bus={bus}
+          direction={direction}
+          busStops={busStops}
+          station={station}
+        />
+        <ShowOverlayStops busOverlay={busOverlay} />
       </MapContainer>
     </>
   );
@@ -95,7 +100,7 @@ const ShowPolyLines = ({
   busShape: BusGeo[];
 }) => {
   const map = useMap();
-
+  const getColor = useOverlayColor()
   useEffect(() => {
     if (busShape) {
       const positionStr = busShape[Number(direction)]?.Geometry;
@@ -141,6 +146,7 @@ const ShowPolyLines = ({
       (item) =>
         item.Direction === Number(direction) && item.RouteName.Zh_tw === bus
     )?.Stops;
+    const color = getColor(bus)
 
     return (
       <>
@@ -150,7 +156,7 @@ const ShowPolyLines = ({
           direction={direction}
           pathOptions={{
             opacity: 0.6,
-            color: "#809fff",
+            color,
             weight: 8,
           }}
           headSign={
@@ -175,6 +181,7 @@ const ShowOverlayPolylines = ({
   direction: string;
   busOverlay: BusOverlay[];
 }) => {
+  const getColor = useOverlayColor();
   return (
     <>
       {busOverlay.map((item) => {
@@ -196,22 +203,7 @@ const ShowOverlayPolylines = ({
         const headSign = `${item.RouteName.Zh_tw}（${
           item.Stops[0].StopName.Zh_tw
         } - ${item.Stops[item.Stops.length - 1].StopName.Zh_tw}）`;
-        const color_r = Math.floor(
-          256 * seedrandom(item.RouteName.Zh_tw + "r")()
-        )
-          .toString(16)
-          .padStart(2, "0");
-        const color_g = Math.floor(
-          256 * seedrandom(item.RouteName.Zh_tw + "g")()
-        )
-          .toString(16)
-          .padStart(2, "0");
-        const color_b = Math.floor(
-          256 * seedrandom(item.RouteName.Zh_tw + "b")()
-        )
-          .toString(16)
-          .padStart(2, "0");
-        const color = `#${color_r}${color_g}${color_b}`;
+        const color = getColor(item.RouteName.Zh_tw);
         return (
           <ShowPolyline
             routeName={item.RouteName.Zh_tw}
@@ -230,46 +222,65 @@ const ShowOverlayPolylines = ({
     </>
   );
 };
-const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
-  const ref = useRef<L.Marker>(null);
+const ShowOverlayStops = ({
+  busOverlay,
+}: {
+  busOverlay: BusOverlay[];
+}) => {
   const flatall = busOverlay.map((d) => d.Stops).flat();
   const flatName = flatall
     .map((d) => d.StopName.Zh_tw)
     .filter((item, index, arr) => arr.indexOf(item) === index);
-  // const filteredOverlap = flatName.filter(name => !busStopFlat?.find(item => item === name))
-  const icon = new Icon({
-    iconUrl: "/pin3.png",
-    iconSize: [16, 16],
-  });
 
+  const flatNameWithRouteList = flatName.map((item) => {
+    let countArr: string[] = [];
+    busOverlay.forEach((d) => {
+      d.Stops.forEach((data) => {
+        if (data.StopName.Zh_tw === item) {
+          countArr = [...countArr, d.RouteName.Zh_tw];
+        }
+      });
+    });
+    return {
+      name: item,
+      passby: countArr,
+    };
+  });
+  const getColor = useOverlayColor();
   return (
     <>
-      {flatName.map((name) => {
-        const item = flatall.find((d) => d.StopName.Zh_tw === name);
+      {flatNameWithRouteList.map((data) => {
+        const item = flatall.find((d) => d.StopName.Zh_tw === data.name);
+        const color = getColor(data.passby[0]);
+        const markerHtmlStyles = `
+  background-color: white;
+  width:  1rem;
+  height: 1rem;
+  display: block;
+  left: -0.5rem;
+  bottom: -0.7rem;
+  position: relative;
+  border-radius: 0.5rem;
+  transform: rotate(45deg);
+  border: 0.15rem solid ${color}`;
+        const icon = new DivIcon({
+          className: "my-custom-pin",
+          iconAnchor: [0, 24],
+          popupAnchor: [0, -12],
+          html: `<span style="${markerHtmlStyles}" />`,
+        });
         return (
           <>
             {!!item && (
-              <Marker
-                ref={ref}
-                riseOffset={-12}
+              <ShowMarker
+                item={item}
+                currentStation=""
                 icon={icon}
-                key={`${item.StopSequence}`}
-                position={[
-                  item.StopPosition.PositionLat,
-                  item.StopPosition.PositionLon,
-                ]}
-              >
-                <Popup>
-                  <div>
-                    <p>{`${item.StopName.Zh_tw}`}</p>
-                  </div>
-                </Popup>
-                <Tooltip direction="bottom">
-                  <div>
-                    <p>{`${item.StopName.Zh_tw}`}</p>
-                  </div>
-                </Tooltip>
-              </Marker>
+                tooltipDisplay={{
+                  display: false,
+                  text: data.name,
+                }}
+              />
             )}
           </>
         );
@@ -281,7 +292,7 @@ const ShowStops = ({
   bus,
   direction,
   busStops,
-  station
+  station,
 }: {
   bus: string;
   direction: string;
@@ -303,7 +314,7 @@ const ShowStops = ({
             <ShowMarker
               item={item}
               key={`${item.StopSequence} ${item.StopName.Zh_tw}`}
-              station={station}
+              currentStation={station}
             />
           );
         })}
