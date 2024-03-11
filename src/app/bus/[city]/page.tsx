@@ -13,7 +13,7 @@ export default async function City({ params }: { params: { city: string } }) {
       <div className="md:h-full flex-grow rounded-md overflow-hidden bg-slate-800">
         <Map city={city} />
       </div>
-      <div className="md:h-full md:w-[25rem] h-[50vh]">
+      <div className="md:h-full md:w-[25rem] h-[45vh]">
         <Nav city={city} />
       </div>
       <Toaster />
