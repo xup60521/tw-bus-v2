@@ -237,6 +237,7 @@ const ShowOverlayStops = ({
         let h = ""
         data.passby.forEach((item, index, arr) => {
           const color = getColor(item);
+          const {length} = arr
           if (index === 0) {
             h = `<span style="display: block;
             border-radius: 100%;background-color: white;
@@ -244,9 +245,12 @@ const ShowOverlayStops = ({
             height: 1rem;
             position: relative;
             border: 0.25rem solid ${color};"></span>`
-          } else {
+          } else if (index!==length-1) {
             h = `<span style="display: block;width:fit-content;
             border-radius: 100%;border: 0.25rem solid ${color};">${h}</span>`
+          } else {
+            h = `<span style="display: block;width:fit-content;
+            border-radius: 100%;border: 0.25rem solid ${color};transform: translate(-50%, -50%);">${h}</span>`
           }
         })
   //       const markerHtmlStyles = `
@@ -261,7 +265,7 @@ const ShowOverlayStops = ({
   // border: 0.15rem solid ${color}`;
         const icon = new DivIcon({
           className: "my-custom-pin",
-          iconAnchor: [10, 6],
+          iconAnchor: [0, 0],
           popupAnchor: [0, -12],
           html: h,
         });
