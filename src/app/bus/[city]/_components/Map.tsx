@@ -23,7 +23,7 @@ import { DivIcon, Icon } from "leaflet";
 import { useOverlayColor } from "@/hooks/useOverlayColor";
 import { LinearToArray } from "@/lib/utils";
 
-export default function Map({ city }: { city: string }) {
+export default function Map() {
   const position = useMemo(
     () => ({ lat: 24.137396608878987, lng: 120.68692065044608 }), // [緯度, 經度]
     []

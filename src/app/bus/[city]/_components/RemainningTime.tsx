@@ -36,7 +36,7 @@ export default function RemainningTime({
       .padStart(2, "0")}`;
 
     return (
-      <div className="w-20 p-1 py-[0.125rem] text-center rounded-md border-slate-100 border-[1px] text-slate-700">
+      <div className="w-20 p-1 py-[0.125rem] text-center rounded-md border-slate-100 border-[1px] text-white">
         {time}
       </div>
     );

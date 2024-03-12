@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import ReactSelect from "react-select";
 import Link from "next/link";
 const list = [
@@ -48,13 +48,20 @@ export default function SelectCity(): React.ReactNode {
           }
           if (item.value === value) {
             return (
+              <Fragment key={item.value}>
               <Link
                 className="rounded-lg bg-sky-500 p-2 px-6 font-bold text-white transition-all hover:bg-sky-400"
-                key={item.value}
                 href={`/bus/${item.value}`}
               >
-                進入
+                公車
               </Link>
+              <Link
+                className="rounded-lg bg-sky-500 p-2 px-6 font-bold text-white transition-all hover:bg-sky-400"
+                href={`/route/${item.value}`}
+              >
+                路線圖
+              </Link>
+              </Fragment>
             );
           }
         })}

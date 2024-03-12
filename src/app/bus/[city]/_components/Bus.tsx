@@ -161,7 +161,6 @@ export default function Bus({
         setURLSearchParams={setURLSearchParams}
         bus={bus}
       />
-      
     </>
   );
 }
@@ -187,7 +186,7 @@ function DrawerSection({
   const [qString, setQString] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const [openPopup, setOpenPopup] = useState(false)
+  const [openPopup, setOpenPopup] = useState(false);
   if (!Array.isArray(initBusList)) {
     return null;
   }
@@ -223,13 +222,20 @@ function DrawerSection({
             <DrawerTitle asChild>
               <div className="flex justify-between items-center">
                 <p>選擇公車</p>
-                {bus ? <div className="flex gap-2 items-center">
-                  <p>{bus}</p>
-                  <button onClick={()=>{
-                    closeBtnRef.current?.click()
-                    setOpenPopup(true)
-                  }} className=" text-xs border-2 transition-all hover:bg-slate-700 hover:text-white rounded border-slate-700 p-1"><FaInfo /></button>
-                </div> : null}
+                {bus ? (
+                  <div className="flex gap-2 items-center">
+                    <p>{bus}</p>
+                    <button
+                      onClick={() => {
+                        closeBtnRef.current?.click();
+                        setOpenPopup(true);
+                      }}
+                      className=" text-xs border-2 transition-all hover:bg-slate-700 hover:text-white rounded border-slate-700 p-1"
+                    >
+                      <FaInfo />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </DrawerTitle>
           </DrawerHeader>
@@ -249,19 +255,31 @@ function DrawerSection({
             />
             <ScrollArea className="h-[60vh] w-full">
               <div className="w-full flex flex-col">
+                <div onClick={()=>{
+                  setURLSearchParams([
+                    {
+                      key: "bus",
+                      value: ""
+                    }, {
+                      key: "direction",
+                      value: ""
+                    }])
+                  setDirection("")
+                }} className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all">
+                  取消選取
+                </div>
                 {data.map((item, index) => {
                   return (
                     <Fragment
                       key={`fragment ${item.SubRoutes[0].SubRouteName.Zh_tw}`}
                     >
-                      {index !== 0 && (
-                        <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
-                      )}
+                      <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
+
                       <div
                         onClick={() => {
                           closeBtnRef.current?.click();
                           setQString("");
-                          setDirection("0")
+                          setDirection("0");
                           setURLSearchParams([
                             {
                               key: "bus",
@@ -272,13 +290,6 @@ function DrawerSection({
                               value: "0",
                             },
                           ]);
-                          // setBus(item.RouteName.Zh_tw);
-                          // setDirection("0");
-                          // router.push(
-                          //   `?bus=${
-                          //     item.RouteName.Zh_tw
-                          //   }&direction=${"0"}&station=${station}`
-                          // );
                         }}
                         className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
                       >
@@ -301,7 +312,11 @@ function DrawerSection({
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-      <PopupSection openPopup={openPopup} setOpenPopup={setOpenPopup} bus={bus} />
+      <PopupSection
+        openPopup={openPopup}
+        setOpenPopup={setOpenPopup}
+        bus={bus}
+      />
     </>
   );
 }
@@ -399,15 +414,17 @@ const StopList = ({
 const PopupSection = ({
   openPopup,
   setOpenPopup,
-  bus
-}:{
+  bus,
+}: {
   openPopup: boolean;
   setOpenPopup: React.Dispatch<React.SetStateAction<boolean>>;
   bus: string;
 }) => {
-  return <Popup open={openPopup} onClose={()=>setOpenPopup(false)}>
-    <div className="w-[90vw] max-w-[50rem] h-[90vh] max-h-[50rem] bg-white rounded-lg flex flex-col">
-      <h3 className="w-full p-2 text-lg">{bus}</h3>
-    </div>
-  </Popup>
-}
+  return (
+    <Popup open={openPopup} onClose={() => setOpenPopup(false)}>
+      <div className="w-[90vw] max-w-[50rem] h-[90vh] max-h-[50rem] bg-white rounded-lg flex flex-col">
+        <h3 className="w-full p-2 text-lg">{bus}</h3>
+      </div>
+    </Popup>
+  );
+};

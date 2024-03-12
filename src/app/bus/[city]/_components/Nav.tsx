@@ -19,21 +19,16 @@ import { getBusStops } from "@/server_action/getBusStops";
 import { getBusShape } from "@/server_action/getBusShape";
 import { LinearToArray } from "@/lib/utils";
 
-export default function Nav({ city }: { city: string }) {
+export default function Nav({ city, initBusList }: { city: string, initBusList: BusList[] }) {
   const searchParams = useSearchParams();
   useHydrateAtoms([[pageAtom, searchParams.get("page") ?? "bus"]]);
   const page = useAtomValue(pageAtom);
   const setBusShape = useSetAtom(busShapeAtom)
   const setBusStops = useSetAtom(busStopsAtom)
   const bus = searchParams.get("bus") ?? ""
-  const [initBusList, setInitBusList] = useState<BusList[]>([]);
   
-  useEffect(() => {
-    getAllBus(city).then((res: BusList[]) => {
-      setInitBusList([...res]);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  
+  
   useEffect(() => {
     if (bus) {
       getBusStops(bus, city)
@@ -44,12 +39,12 @@ export default function Nav({ city }: { city: string }) {
               const withDirectionData = shapes
                 .map((item, index, arr) => {
                   const d0 = stops
-                    .find((d) => d.Direction === 0)
+                    .find((d) => d.Direction === 0 && d.RouteName.Zh_tw === bus)
                     ?.Stops.sort(
                       (a, b) => a.StopSequence - b.StopSequence
                     )[0].StopPosition;
                   const d1 = stops
-                    .find((d) => d.Direction === 1)
+                    .find((d) => d.Direction === 1 && d.RouteName.Zh_tw === bus)
                     ?.Stops.sort(
                       (a, b) => a.StopSequence - b.StopSequence
                     )[0].StopPosition;
@@ -85,7 +80,7 @@ export default function Nav({ city }: { city: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bus]);
   return (
-    <ReactQuery>
+    <>
       {(() => {
         if (page === "station") {
           return <Station city={city} />;
@@ -99,7 +94,7 @@ export default function Nav({ city }: { city: string }) {
         return <Bus city={city} initBusList={initBusList} />;
       })()}
       <Controller />
-    </ReactQuery>
+    </>
   );
 }
 

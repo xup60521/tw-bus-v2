@@ -1,22 +1,41 @@
-import { unstable_noStore } from "next/cache";
+"use client";
 import dynamic from "next/dynamic";
 import Nav from "./_components/Nav";
 import { Toaster } from "@/components/ui/toaster";
+import { useEffect, useState } from "react";
+import ReactQuery from "./_components/ReactQueryClient";
+import type { BusList } from "@/type/busType";
+import { getAllBus } from "@/server_action/getAllBus";
 
 const Map = dynamic(() => import("./_components/Map"), { ssr: false });
-export default async function City({ params }: { params: { city: string } }) {
-  unstable_noStore();
+export default function City({ params }: { params: { city: string } }) {
   const { city } = params;
-  
+  const [openNav, setOpenNav] = useState(false);
+  const [initBusList, setInitBusList] = useState<BusList[]>([]);
+  useEffect(() => {
+    getAllBus(city).then((res: BusList[]) => {
+      setInitBusList([...res]);
+    });
+    setOpenNav(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <main className="w-screen h-screen flex md:flex-row flex-col gap-2 min-h-0 min-w-0 bg-slate-800 text-white p-2">
-      <div className="md:h-full flex-grow rounded-md overflow-hidden bg-slate-800">
-        <Map city={city} />
-      </div>
-      <div className="md:h-full md:w-[25rem] h-[45vh]">
-        <Nav city={city} />
-      </div>
+    <ReactQuery>
+      <main className="w-screen h-screen flex md:flex-row relative flex-col gap-2 min-h-0 min-w-0 bg-slate-800 text-white p-2">
+        <div className="md:h-full flex-grow rounded-md overflow-hidden bg-blue-800">
+          <Map />
+        </div>
+        <button onClick={()=>setOpenNav(!openNav)} className="absolute left-4 bottom-4 rounded-full bg-gray-300 opacity-50 text-black transition-all hover:scale-125 p-2 px-4 text-md hover:opacity-100">{openNav ? "X" : "V"}</button>
+        
+          <>
+            <div className={`md:h-full md:w-[25rem] h-[45vh] ${openNav ? "" : "hidden"}`}>
+              <Nav city={city} initBusList={initBusList} />
+            </div>
+          </>
+        
+      </main>
       <Toaster />
-    </main>
+    </ReactQuery>
   );
 }
