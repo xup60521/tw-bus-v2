@@ -17,6 +17,7 @@ import { busShapeAtom, busStopsAtom, pageAtom } from "@/state/busState";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getBusStops } from "@/server_action/getBusStops";
 import { getBusShape } from "@/server_action/getBusShape";
+import { LinearToArray } from "@/lib/utils";
 
 export default function Nav({ city }: { city: string }) {
   const searchParams = useSearchParams();
@@ -55,15 +56,7 @@ export default function Nav({ city }: { city: string }) {
                   if (item.Direction) {
                     return item;
                   } else if (arr.length === 2 && d0 && d1) {
-                    const regex = /[A-Z()]/g;
-                    const position = item.Geometry.replace(regex, "")
-                      .split(",")
-                      .map((f) =>
-                        f
-                          .split(" ")
-                          .reverse()
-                          .map((item) => Number(item))
-                      )[0] as [number, number];
+                    const position = LinearToArray(item.Geometry)[0] as [number, number];
                     const length_to_d0 =
                       (position[0] - d0.PositionLat) ** 2 +
                       (position[1] - d0.PositionLon) ** 2;

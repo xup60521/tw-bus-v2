@@ -21,6 +21,7 @@ import ShowMarker from "./ShowMarker";
 import ShowPolyline from "./ShowPolyline";
 import { DivIcon, Icon } from "leaflet";
 import { useOverlayColor } from "@/hooks/useOverlayColor";
+import { LinearToArray } from "@/lib/utils";
 
 export default function Map({ city }: { city: string }) {
   const position = useMemo(
@@ -104,16 +105,7 @@ const ShowPolyLines = ({
   useEffect(() => {
     if (busShape) {
       const positionStr = busShape[Number(direction)]?.Geometry;
-      const regex = /[A-Z()]/g;
-      const positionArr = positionStr
-        ?.replace(regex, "")
-        .split(",")
-        .map((f) =>
-          f
-            .split(" ")
-            .reverse()
-            .map((item) => Number(item))
-        ) as [number, number][];
+      const positionArr = (positionStr ? LinearToArray(positionStr) : undefined)
       if (positionArr) {
         const center = { lat: 0, lng: 0 } as { lat: number; lng: number };
         positionArr.forEach((d, _i, arr) => {
@@ -132,16 +124,7 @@ const ShowPolyLines = ({
   const positionStr =
     busShape[Number(direction)]?.Geometry ?? busShape[0]?.Geometry;
   if (positionStr) {
-    const regex = /[A-Z()]/g;
-    const positionArr = positionStr
-      .replace(regex, "")
-      .split(",")
-      .map((f) =>
-        f
-          .split(" ")
-          .reverse()
-          .map((item) => Number(item))
-      ) as [number, number][];
+    const positionArr = LinearToArray(positionStr)
     const thisStops = busStops?.find(
       (item) =>
         item.Direction === Number(direction) && item.RouteName.Zh_tw === bus
@@ -191,15 +174,7 @@ const ShowOverlayPolylines = ({
         ) {
           return null;
         }
-        const regex = /[A-Z()]/g;
-        const positionArr = item.Geometry.replace(regex, "")
-          .split(",")
-          .map((f) =>
-            f
-              .split(" ")
-              .reverse()
-              .map((item) => Number(item))
-          ) as [number, number][];
+        const positionArr = LinearToArray(item.Geometry)
         const headSign = `${item.RouteName.Zh_tw}（${
           item.Stops[0].StopName.Zh_tw
         } - ${item.Stops[item.Stops.length - 1].StopName.Zh_tw}）`;
