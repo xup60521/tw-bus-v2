@@ -26,10 +26,10 @@ export default function City({ params }: { params: { city: string } }) {
         <div className="md:h-full flex-grow rounded-md overflow-hidden bg-blue-800">
           <Map />
         </div>
-        <button onClick={()=>setOpenNav(!openNav)} className="absolute left-4 bottom-4 rounded-full bg-gray-300 opacity-50 text-black transition-all hover:scale-125 p-2 px-4 text-md hover:opacity-100">{openNav ? "X" : "V"}</button>
+        <button onClick={()=>setOpenNav(!openNav)} className="absolute left-4 md:block hidden bottom-4 rounded-full bg-gray-300 opacity-50 text-black transition-all hover:scale-125 p-2 px-4 text-md hover:opacity-100">{openNav ? "X" : "V"}</button>
         
           <>
-            <div className={`md:h-full md:w-[25rem] h-[45vh] ${openNav ? "" : "hidden"}`}>
+            <div className={`md:h-full md:w-[25rem] h-[45vh] ${openNav ? "" : "md:hidden"}`}>
               <Nav city={city} initBusList={initBusList} />
             </div>
           </>

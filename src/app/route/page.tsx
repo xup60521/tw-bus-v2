@@ -1,6 +1,6 @@
 import SelectCity from "../SelectCity";
 
 
-export function Page() {
+export default function Page() {
     return <SelectCity />
 }
