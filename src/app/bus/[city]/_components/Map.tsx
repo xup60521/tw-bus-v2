@@ -226,14 +226,6 @@ const ShowOverlayStops = ({
     <>
       {flatNameWithRouteList.map((data) => {
         const item = flatall.find((d) => d.StopName.Zh_tw === data.name);
-        // let h = `<span style="display: block;width:fit-content;
-        // border-radius: 100%;border: 0.25rem solid blue;"><span style="display: block;
-        // border-radius: 100%;background-color: white;
-        // width:  1rem;
-        // height: 1rem;
-        // position: relative;
-        // border: 0.25rem solid red;">
-        // </span></span>`
         let h = ""
         data.passby.forEach((item, index, arr) => {
           const color = getColor(item);
@@ -241,16 +233,16 @@ const ShowOverlayStops = ({
           if (index === 0) {
             h = `<span style="display: block;
             border-radius: 100%;background-color: white;
-            width:  1rem;
-            height: 1rem;
+            width:  ${1 / length}rem;
+            height: ${1 / length}rem;
             position: relative;
             border: 0.25rem solid ${color};"></span>`
           } else if (index!==length-1) {
             h = `<span style="display: block;width:fit-content;
-            border-radius: 100%;border: 0.25rem solid ${color};">${h}</span>`
+            border-radius: 100%;border: ${1.15 / length}rem solid ${color};">${h}</span>`
           } else {
             h = `<span style="display: block;width:fit-content;
-            border-radius: 100%;border: 0.25rem solid ${color};transform: translate(-50%, -50%);">${h}</span>`
+            border-radius: 100%;border: ${1.15 / length}rem solid ${color};transform: translate(-50%, -50%);">${h}</span>`
           }
         })
   //       const markerHtmlStyles = `
