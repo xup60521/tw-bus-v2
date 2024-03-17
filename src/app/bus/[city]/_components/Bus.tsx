@@ -265,6 +265,7 @@ function DrawerSection({
                       value: ""
                     }])
                   setDirection("")
+                  setOpen(false)
                 }} className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all">
                   取消選取
                 </div>

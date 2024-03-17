@@ -79,6 +79,8 @@ export default function Nav({ city, initBusList }: { city: string, initBusList: 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bus]);
+
+  
   return (
     <>
       {(() => {
