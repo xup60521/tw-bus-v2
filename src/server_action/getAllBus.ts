@@ -1,9 +1,14 @@
 "use server";
-
+import "server-only"
 import { get_access_token } from "@/lib/get_access_token";
 import type { BusList } from "@/type/busType";
+import { allBusList } from "@/lib/stableData";
 
 export async function getAllBus(city?: string) {
+  const buslist = allBusList[city ?? ""]
+  if (buslist) {
+    return buslist
+  }
   const access_token_res = await get_access_token();
   const access_token = access_token_res.access_token;
   const initBusList_res = await fetch(
