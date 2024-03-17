@@ -13,29 +13,57 @@ import {
 import { useAtom, type SetStateAction, useSetAtom } from "jotai";
 import { FaTrash } from "react-icons/fa6";
 import { FiMenu } from "react-icons/fi";
-import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { overlayAtom, pageAtom, togglePolylineAtom } from "@/state/busState";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
-export default function Overlay() {
+export default function Overlay({ city }: { city: string }) {
   const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
-  const searchParams = useSearchParams();
-  const station = searchParams.get("station") ?? "";
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
-      <div className="w-full box-border border-b-[1px] border-white flex gap-1 pb-2 items-center h-fit min-h-0">
+      <div className="w-full box-border border-b-[1px] border-white flex gap-1 pb-2 items-center h-fit min-h-0 justify-between">
         <span className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all">
           Overlay
         </span>
+        <div className="flex h-full items-end py-1 text-sm text-gray-300 gap-2">
+          <button className="transition-all hover:text-orange-200" onClick={()=>{
+            setBusOverlay(prev => {
+              const newArr = prev[city]?.map(d => {
+                d.ShowOverlay = true
+                return d
+              })
+              if (!newArr) {
+                return {...prev}
+              }
+              prev[city] = newArr
+              return {...prev}
+            })
+          }}>全部顯示</button>
+          <p className="h-full border-r-[1px] border-gray-300 translate-y-[2px]"></p>
+          <button className="transition-all hover:text-orange-200" onClick={()=>{
+            setBusOverlay(prev => {
+              const newArr = prev[city]?.map(d => {
+                d.ShowOverlay = false
+                return d
+              })
+              if (!newArr) {
+                return {...prev}
+              }
+              prev[city] = newArr
+              return {...prev}
+            })
+          }}>全部隱藏</button>
+        </div>
       </div>
       <ScrollArea className="w-full h-full p-1">
         <div className="flex w-full flex-col gap-1">
           <OverlayList
             busOverlay={busOverlay}
             setBusOverlay={setBusOverlay}
-            station={station}
+            city={city}
           />
         </div>
       </ScrollArea>
@@ -46,43 +74,49 @@ export default function Overlay() {
 const OverlayList = ({
   busOverlay,
   setBusOverlay,
-  station,
+  city,
 }: {
-  busOverlay: BusOverlay[];
-  setBusOverlay: SetAtom<[SetStateAction<BusOverlay[]>], void>;
-  station: string;
+  busOverlay: { [key: string]: BusOverlay[] | undefined };
+  setBusOverlay: SetAtom<
+    [SetStateAction<{ [key: string]: BusOverlay[] | undefined }>],
+    void
+  >;
+  city: string;
 }) => {
   const setURLSearchParams = useSetURLSearchParams();
   const { toast } = useToast();
   const setTogglePolyline = useSetAtom(togglePolylineAtom);
-  const setPage = useSetAtom(pageAtom)
+  const setPage = useSetAtom(pageAtom);
 
   const handleRemove = (name: string, direction: number, headSign: string) => {
     setBusOverlay((prev) => {
-      const filtered = prev.filter(
-        (item) => item.RouteName.Zh_tw !== name || item.Direction !== direction
-      );
-      return [...filtered];
+      const filtered =
+        prev[city]?.filter(
+          (item) =>
+            item.RouteName.Zh_tw !== name || item.Direction !== direction
+        ) ?? [];
+      prev[city] = filtered;
+      return { ...prev };
     });
     toast({
       title: "刪除成功",
-      description: headSign,
+      description: `${name}（${headSign}）`,
       className: "bg-red-100",
     });
   };
 
   return (
     <>
-      {busOverlay.map((item) => {
+      {busOverlay[city]?.map((item) => {
         const stopLength = item.Stops.length;
-        const headSign = `${item.RouteName.Zh_tw}（${
-          item.Stops[0].StopName.Zh_tw
-        } - ${item.Stops[stopLength - 1].StopName.Zh_tw}）`;
+        const headSign = `${item.Stops[0].StopName.Zh_tw} - ${
+          item.Stops[stopLength - 1].StopName.Zh_tw
+        }`;
 
         return (
           <div
             key={`overlay ${item.RouteName.Zh_tw} ${item.Direction}`}
-            className="flex w-full items-center justify-between"
+            className="flex w-full items-center gap-4"
           >
             <button
               onClick={() => {
@@ -92,9 +126,10 @@ const OverlayList = ({
                   id: prev.id + 1,
                 }));
               }}
-              className="relative group text-white p-1"
+              className="relative group text-white p-1 text-left w-full"
             >
-              <span>{headSign}</span>
+              <p>{item.RouteName.Zh_tw}</p>
+              <p className="text-xs text-gray-300">{headSign}</p>
               <span
                 className={`absolute -bottom-1 left-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
               ></span>
@@ -125,7 +160,7 @@ const OverlayList = ({
                       //   router.push(
                       //     `?bus=${item.RouteName.Zh_tw}&direction=${item.Direction}&station=${station}`
                       //   );
-                      setPage("bus")
+                      setPage("bus");
                       setURLSearchParams([
                         {
                           key: "bus",
@@ -146,6 +181,29 @@ const OverlayList = ({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <Switch
+                checked={item.ShowOverlay}
+                className="-ml-2"
+                onCheckedChange={(e) => {
+                  setBusOverlay((prev) => {
+                    const newArr = prev[city]?.map((d) => {
+                      if (
+                        d.RouteName.Zh_tw === item.RouteName.Zh_tw &&
+                        d.Direction === item.Direction
+                      ) {
+                        d.ShowOverlay = e;
+                        return d;
+                      }
+                      return d;
+                    });
+                    if (!newArr) {
+                      return { ...prev };
+                    }
+                    prev[city] = newArr;
+                    return { ...prev };
+                  });
+                }}
+              />
             </div>
           </div>
         );

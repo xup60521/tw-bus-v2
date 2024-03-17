@@ -57,6 +57,7 @@ export default function Station({ city }: { city: string }) {
         <ScrollArea className="w-full h-full">
           <div className="flex w-full flex-col gap-1 p-1">
             <BusList
+              city={city}
               bus={bus}
               direction={direction}
               list={data.data}
@@ -111,7 +112,7 @@ function PopupSetStation({
       <div className="flex w-[95vw] flex-col  items-center gap-3 rounded-lg bg-white p-4 transition-all md:w-[40rem]">
         <h3 className="w-full text-center text-xl">搜尋站牌</h3>
         <div className="flex w-full gap-2">
-          <Input onKeyDown={handleEnter} ref={inputRef} className="flex-grow" />
+          <Input onKeyDown={handleEnter} ref={inputRef} className="flex-grow text-lg" />
           <Button onClick={handleSearch} className="bg-slate-700">
             {loading ? <FaSpinner className="animate-spin" /> : <FaSearch />}
           </Button>
@@ -159,15 +160,17 @@ const BusList = ({
   list,
   bus,
   direction,
+  city,
 }: {
   list?: BusRoutePassBy[];
   bus: string;
   direction: string;
+  city: string;
 }) => {
   const busOverlay = useAtomValue(overlayAtom);
-  const add_remove_overlay = useOverlay();
+  const add_remove_overlay = useOverlay({city});
   const setURLSearchParams = useSetURLSearchParams();
-  const setPage = useSetAtom(pageAtom)
+  const setPage = useSetAtom(pageAtom);
   return (
     <>
       {list
@@ -176,7 +179,7 @@ const BusList = ({
             Number(RNN(a.RouteName.Zh_tw)) - Number(RNN(b.RouteName.Zh_tw))
         )
         .map((item) => {
-          const isOverlayed = !!busOverlay.find(
+          const isOverlayed = !!busOverlay[city]?.find(
             (d) =>
               d.RouteName.Zh_tw === item.RouteName.Zh_tw &&
               item.Direction === Number(direction)
@@ -193,7 +196,6 @@ const BusList = ({
                 />
                 <button
                   onClick={() => {
-                    
                     setURLSearchParams([
                       {
                         key: "bus",
@@ -235,7 +237,7 @@ const BusList = ({
                 <DropdownMenuContent>
                   <DropdownMenuItem
                     onClick={() => {
-                      setPage("bus")
+                      setPage("bus");
                       setURLSearchParams([
                         {
                           key: "bus",
@@ -272,4 +274,3 @@ const BusList = ({
     </>
   );
 };
-

@@ -6,7 +6,6 @@ import {
 import Bus from "./Bus";
 import Station from "./Station";
 import Note from "./Note";
-import Overlay from "./Overlay";
 import type { BusList } from "@/type/busType";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import ReactQuery from "./ReactQueryClient";
@@ -18,6 +17,9 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getBusStops } from "@/server_action/getBusStops";
 import { getBusShape } from "@/server_action/getBusShape";
 import { LinearToArray } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const Overlay = dynamic(()=>import("./Overlay"), {ssr: false})
 
 export default function Nav({ city, initBusList }: { city: string, initBusList: BusList[] }) {
   const searchParams = useSearchParams();
@@ -91,7 +93,7 @@ export default function Nav({ city, initBusList }: { city: string, initBusList: 
           return <Note />;
         }
         if (page === "overlay") {
-          return <Overlay />;
+          return <Overlay city={city} />;
         }
         return <Bus city={city} initBusList={initBusList} />;
       })()}

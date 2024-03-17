@@ -72,9 +72,9 @@ export default function Bus({
     direction1,
     isOneWay,
   } = useSeparateStops(busStops, busEst.data);
-  const add_remove_overlay = useOverlay();
+  const add_remove_overlay = useOverlay({city});
   const busOverlay = useAtomValue(overlayAtom);
-  const isOverlayed = !!busOverlay.find(
+  const isOverlayed = !!busOverlay[city]?.find(
     (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
   );
 
@@ -243,6 +243,7 @@ function DrawerSection({
             <Input
               ref={inputRef}
               value={qString}
+              className="text-lg"
               onChange={(e) => {
                 setQString(e.target.value);
               }}

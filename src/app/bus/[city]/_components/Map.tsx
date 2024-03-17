@@ -1,29 +1,18 @@
 "use client";
-import { useEffect, useMemo, useRef } from "react";
-import {
-  MapContainer,
-  Marker,
-  Polyline,
-  Popup,
-  TileLayer,
-  Tooltip,
-  useMap,
-} from "react-leaflet";
-import seedrandom from "seedrandom";
+import { useEffect, useMemo } from "react";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useSearchParams } from "next/navigation";
-import { getBusStops } from "@/server_action/getBusStops";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { busShapeAtom, busStopsAtom, overlayAtom } from "@/state/busState";
-import { getBusShape } from "@/server_action/getBusShape";
 import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
 import ShowMarker from "./ShowMarker";
 import ShowPolyline from "./ShowPolyline";
-import { DivIcon, Icon } from "leaflet";
+import { DivIcon } from "leaflet";
 import { useOverlayColor } from "@/hooks/useOverlayColor";
 import { LinearToArray } from "@/lib/utils";
 
-export default function Map() {
+export default function Map({ city }: { city: string }) {
   const position = useMemo(
     () => ({ lat: 24.137396608878987, lng: 120.68692065044608 }), // [緯度, 經度]
     []
@@ -34,7 +23,7 @@ export default function Map() {
   const station = searchParams.get("station") ?? "";
   const busShape = useAtomValue(busShapeAtom);
   const busStops = useAtomValue(busStopsAtom);
-  const busOverlay = useAtomValue(overlayAtom);
+  const busOverlay = useAtomValue(overlayAtom)[city]?.filter(d => d.ShowOverlay) ?? [];
 
   return (
     <>
@@ -101,11 +90,11 @@ const ShowPolyLines = ({
   busShape: BusGeo[];
 }) => {
   const map = useMap();
-  const getColor = useOverlayColor()
+  const getColor = useOverlayColor();
   useEffect(() => {
     if (busShape) {
       const positionStr = busShape[Number(direction)]?.Geometry;
-      const positionArr = (positionStr ? LinearToArray(positionStr) : undefined)
+      const positionArr = positionStr ? LinearToArray(positionStr) : undefined;
       if (positionArr) {
         const center = { lat: 0, lng: 0 } as { lat: number; lng: number };
         positionArr.forEach((d, _i, arr) => {
@@ -124,12 +113,12 @@ const ShowPolyLines = ({
   const positionStr =
     busShape[Number(direction)]?.Geometry ?? busShape[0]?.Geometry;
   if (positionStr) {
-    const positionArr = LinearToArray(positionStr)
+    const positionArr = LinearToArray(positionStr);
     const thisStops = busStops?.find(
       (item) =>
         item.Direction === Number(direction) && item.RouteName.Zh_tw === bus
     )?.Stops;
-    const color = getColor(bus)
+    const color = getColor(bus);
 
     return (
       <>
@@ -174,7 +163,7 @@ const ShowOverlayPolylines = ({
         ) {
           return null;
         }
-        const positionArr = LinearToArray(item.Geometry)
+        const positionArr = LinearToArray(item.Geometry);
         const headSign = `${item.RouteName.Zh_tw}（${
           item.Stops[0].StopName.Zh_tw
         } - ${item.Stops[item.Stops.length - 1].StopName.Zh_tw}）`;
@@ -197,12 +186,11 @@ const ShowOverlayPolylines = ({
     </>
   );
 };
-const ShowOverlayStops = ({
-  busOverlay,
-}: {
-  busOverlay: BusOverlay[];
-}) => {
-  const flatall = busOverlay.map((d) => d.Stops).flat();
+const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
+  const flatall = busOverlay
+    .filter((d) => d.ShowOverlay)
+    .map((d) => d.Stops)
+    .flat();
   const flatName = flatall
     .map((d) => d.StopName.Zh_tw)
     .filter((item, index, arr) => arr.indexOf(item) === index);
@@ -226,35 +214,39 @@ const ShowOverlayStops = ({
     <>
       {flatNameWithRouteList.map((data) => {
         const item = flatall.find((d) => d.StopName.Zh_tw === data.name);
-        let h = ""
+        let h = "";
         data.passby.forEach((item, index, arr) => {
           const color = getColor(item);
-          const {length} = arr
+          const { length } = arr;
           if (index === 0) {
             h = `<span style="display: block;
             border-radius: 100%;background-color: white;
             width:  ${1 / length}rem;
             height: ${1 / length}rem;
             position: relative;
-            border: 0.25rem solid ${color};"></span>`
-          } else if (index!==length-1) {
+            border: 0.25rem solid ${color};"></span>`;
+          } else if (index !== length - 1) {
             h = `<span style="display: block;width:fit-content;
-            border-radius: 100%;border: ${1.15 / length}rem solid ${color};">${h}</span>`
+            border-radius: 100%;border: ${
+              1.15 / length
+            }rem solid ${color};">${h}</span>`;
           } else {
             h = `<span style="display: block;width:fit-content;
-            border-radius: 100%;border: ${1.15 / length}rem solid ${color};transform: translate(-50%, -50%);">${h}</span>`
+            border-radius: 100%;border: ${
+              1.15 / length
+            }rem solid ${color};transform: translate(-50%, -50%);">${h}</span>`;
           }
-        })
-  //       const markerHtmlStyles = `
-  // background-color: white;
-  // width:  1rem;
-  // height: 1rem;
-  // display: block;
-  // left: -0.5rem;
-  // bottom: -0.7rem;
-  // position: relative;
-  // border-radius: 0.5rem;
-  // border: 0.15rem solid ${color}`;
+        });
+        //       const markerHtmlStyles = `
+        // background-color: white;
+        // width:  1rem;
+        // height: 1rem;
+        // display: block;
+        // left: -0.5rem;
+        // bottom: -0.7rem;
+        // position: relative;
+        // border-radius: 0.5rem;
+        // border: 0.15rem solid ${color}`;
         const icon = new DivIcon({
           className: "my-custom-pin",
           iconAnchor: [0, 0],

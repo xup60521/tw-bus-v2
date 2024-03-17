@@ -94,4 +94,5 @@ export type BusStopSearchResult = {
 
 export type BusOverlay = BusGeo & {
     Stops: BusStops["Stops"];
+    ShowOverlay: boolean;
   };

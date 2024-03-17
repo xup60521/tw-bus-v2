@@ -5,32 +5,37 @@ import { busStopsAtom, busShapeAtom, overlayAtom } from "@/state/busState";
 import { useAtom, useAtomValue } from "jotai";
 import { useSearchParams } from "next/navigation";
 
-export const useOverlay = () => {
+export const useOverlay = ({ city }: { city: string }) => {
   const busStops = useAtomValue(busStopsAtom);
   const busShape = useAtomValue(busShapeAtom);
   const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
-  const searchParams = useSearchParams()
-  const direction = searchParams.get("direction") ?? ""
-  const bus = searchParams.get("bus") ?? ""
+  const searchParams = useSearchParams();
+  const direction = searchParams.get("direction") ?? "";
+  const bus = searchParams.get("bus") ?? "";
   const add_remove_overlay = () => {
     const thisStops = busStops?.find((d) => d.Direction === Number(direction));
     const thisShape = busShape.find((d) => d.Direction === Number(direction));
     // add
+    
     if (
-      !busOverlay.find(
+      !busOverlay[city]?.find(
         (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
       ) &&
-      thisStops &&
-      thisShape
+      !!thisStops &&
+      !!thisShape
     ) {
       setBusOverlay((prev) => {
-        return [
-          ...prev,
+        prev[city] = [
+          ...(prev[city] ?? []),
           {
             ...thisShape,
             Stops: thisStops.Stops,
+            ShowOverlay: true,
           },
         ];
+        return {
+          ...prev,
+        };
       });
       toast({
         title: "新增成功",
@@ -39,19 +44,21 @@ export const useOverlay = () => {
         }）`,
         className: "bg-lime-200",
       });
+      return ;
     }
     //remove
     if (
-      busOverlay.find(
+      busOverlay[city]?.find(
         (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
       )
     ) {
       setBusOverlay((prev) => {
-        const filtered = prev.filter(
+        const filtered = (prev[city] ?? []).filter(
           (item) =>
             item.Direction !== Number(direction) || item.RouteName.Zh_tw !== bus
         );
-        return [...filtered];
+        prev[city] = filtered;
+        return { ...prev };
       });
       const thisStops = busStops?.find(
         (d) => d.Direction === Number(direction)
@@ -64,6 +71,7 @@ export const useOverlay = () => {
         description: sign,
         className: "bg-red-100",
       });
+      return ;
     }
   };
   return add_remove_overlay;
