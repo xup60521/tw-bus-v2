@@ -144,12 +144,12 @@ export default function Bus({
         {/* {JSON.stringify(busEst.isPending)} */}
         <ScrollArea className="w-full h-full">
           <div className="flex w-full flex-col gap-1 py-[6px] pr-2">
-            <StopList
+            {!!bus && <StopList
               list={direction === "0" ? direction0 : direction1}
               stops={direction === "0" ? busStops0 : busStops1}
               setURLSearchParams={setURLSearchParams}
               searchParams={searchParams}
-            />
+            />}
           </div>
         </ScrollArea>
       </div>
