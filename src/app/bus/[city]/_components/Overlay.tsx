@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useOverlayColor } from "@/hooks/useOverlayColor";
 
 export default function Overlay({ city }: { city: string }) {
     const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
@@ -168,6 +169,7 @@ const OverlayList = ({
     const { toast } = useToast();
     const setTogglePolyline = useSetAtom(togglePolylineAtom);
     const setPage = useSetAtom(pageAtom);
+    const getColor = useOverlayColor()
 
     const handleRemove = (
         name: string,
@@ -201,12 +203,12 @@ const OverlayList = ({
                 const headSign = `${item.Stops[0].StopName.Zh_tw} - ${
                     item.Stops[stopLength - 1].StopName.Zh_tw
                 }`;
-
                 return (
                     <div
                         key={`overlay ${item.RouteName.Zh_tw} ${item.Direction}`}
                         className="flex w-full items-center gap-4"
                     >
+                        <div className="h-full text-transparent -mr-2" style={{backgroundColor: getColor(item.RouteName.Zh_tw)}}>|</div>
                         <button
                             onClick={() => {
                                 setTogglePolyline((prev) => ({
