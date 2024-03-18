@@ -25,3 +25,5 @@ export function LinearToArray(positionStr: string) {
     ) as [number, number][];
     return positionArr
 }
+
+export const dayOfAWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]

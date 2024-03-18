@@ -29,7 +29,7 @@ export default function Map({ city }: { city: string }) {
     <>
       <MapContainer
         center={position}
-        zoom={13}
+        zoom={8}
         scrollWheelZoom={true}
         className="z-0 h-full w-full"
       >
@@ -70,7 +70,7 @@ const FlyToCurrent = () => {
         map.flyTo({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-        });
+        }, 13.5);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

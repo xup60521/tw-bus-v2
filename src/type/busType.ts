@@ -98,3 +98,47 @@ export type BusOverlay = BusGeo & {
   Stops: BusStops["Stops"];
   ShowOverlay: boolean;
 };
+
+export type BusSchedule = {
+    RouteName:   Name;
+    Direction:   number;
+    Frequencys?: Frequency[];
+    UpdateTime:  string;
+    VersionID:   number;
+    Timetables?: Timetable[];
+}
+
+type Frequency = {
+    StartTime:      string;
+    EndTime:        string;
+    MinHeadwayMins: number;
+    MaxHeadwayMins: number;
+    ServiceDay:     ServiceDay;
+}
+
+type ServiceDay = {
+    Sunday:    number;
+    Monday:    number;
+    Tuesday:   number;
+    Wednesday: number;
+    Thursday:  number;
+    Friday:    number;
+    Saturday:  number;
+    [key:string]: number | undefined;
+}
+
+
+type Timetable = {
+    TripID:     string;
+    ServiceDay: ServiceDay;
+    StopTimes:  StopTime[];
+}
+
+type StopTime = {
+    StopSequence:  number;
+    StopUID:       string;
+    StopID:        string;
+    StopName:      Name;
+    ArrivalTime:   string;
+    DepartureTime: string;
+}

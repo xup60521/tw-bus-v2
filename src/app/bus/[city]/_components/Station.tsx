@@ -26,6 +26,7 @@ import { useSearchParams } from "next/navigation";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import RemainningTime from "./RemainningTime";
 
+
 export default function Station({ city }: { city: string }) {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();

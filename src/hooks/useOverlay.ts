@@ -13,8 +13,8 @@ export const useOverlay = ({ city }: { city: string }) => {
   const direction = searchParams.get("direction") ?? "";
   const bus = searchParams.get("bus") ?? "";
   const add_remove_overlay = () => {
-    const thisStops = busStops?.find((d) => d.Direction === Number(direction));
-    const thisShape = busShape.find((d) => d.Direction === Number(direction));
+    const thisStops = busStops?.find((d) => d.Direction === Number(direction) && d.RouteName.Zh_tw === bus);
+    const thisShape = busShape.find((d) => d.Direction === Number(direction) && d.RouteName.Zh_tw === bus);
     // add
     
     if (
