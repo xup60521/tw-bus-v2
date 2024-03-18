@@ -47,7 +47,7 @@ export default function Station({ city }: { city: string }) {
   return (
     <>
       <div className="w-full h-full flex flex-col min-h-0">
-        <div className="w-full box-border border-b-[1px] border-white flex gap-1 items-start pb-2 h-fit min-h-0">
+        <div className="w-full flex gap-1 items-start pb-2 h-fit min-h-0">
           <button
             onClick={() => setOpen(true)}
             className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all hover:bg-white hover:text-black "
@@ -55,6 +55,7 @@ export default function Station({ city }: { city: string }) {
             {station ? station : "選擇站牌..."}
           </button>
         </div>
+        <div className="w-full border-t-[1px] border-white"></div>
         <ScrollArea className="w-full h-full">
           <div className="flex w-full flex-col gap-1 p-1">
             <BusList

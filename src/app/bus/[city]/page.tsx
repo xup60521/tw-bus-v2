@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import ReactQuery from "./_components/ReactQueryClient";
 import type { BusList } from "@/type/busType";
 import { getAllBus } from "@/server_action/getAllBus";
+import { useSetAtom } from "jotai";
+import { showCityOverlayAtom } from "@/state/busState";
 // import { DevTools } from 'jotai-devtools'
 
 
@@ -14,11 +16,13 @@ export default function City({ params }: { params: { city: string } }) {
   const { city } = params;
   const [openNav, setOpenNav] = useState(false);
   const [initBusList, setInitBusList] = useState<BusList[]>([]);
+  const setShowCityOverlay = useSetAtom(showCityOverlayAtom)
   useEffect(() => {
     getAllBus(city).then((res: BusList[]) => {
       setInitBusList([...res]);
     });
     setOpenNav(true)
+    setShowCityOverlay([city])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

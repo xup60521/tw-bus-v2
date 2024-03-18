@@ -40,3 +40,4 @@ export const overlayAtom = atomWithStorage<{
 });
 export const noteAtom = atomWithStorage("note", "");
 export const pageAtom = atom("");
+export const showCityOverlayAtom = atom<string[]>([])

@@ -86,7 +86,7 @@ export default function Bus({
     return (
         <>
             <div className="w-full h-full flex flex-col min-h-0">
-                <div className="w-full box-border border-b-[1px] border-white flex gap-1 items-start pb-2 h-fit min-h-0">
+                <div className="w-full flex gap-1 items-start pb-2 h-fit min-h-0">
                     <button
                         className=" bg-transparent text-white py-1 flex-shrink-0 px-3 border-[1px] border-white rounded-md transition-all hover:bg-white hover:text-black"
                         onClick={() => setOpen(true)}
@@ -153,7 +153,7 @@ export default function Bus({
                         </>
                     )}
                 </div>
-                {/* {JSON.stringify(busEst.isPending)} */}
+                <div className="w-full border-t-[1px] border-white"></div>
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-1 py-[6px] pr-2">
                         {!!bus && (
