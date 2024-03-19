@@ -391,6 +391,7 @@ const StopList = ({
                         >
                             <div className="flex h-full items-center gap-2">
                                 <RemainningTime
+                                    StopStatus={g?.StopStatus}
                                     EstimateTime={g?.EstimateTime}
                                     NextBusTime={g?.NextBusTime}
                                 />

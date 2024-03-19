@@ -32,7 +32,7 @@ export type BusEst = {
   Direction: number;
   EstimateTime?: number;
   StopSequence: number;
-  StopStatus: string;
+  StopStatus: number;
   NextBusTime?: string;
   SrcUpdateTime: string;
   UpdateTime: string;
