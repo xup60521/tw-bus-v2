@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { dayOfAWeek } from "@/lib/utils";
 import { getBusSchedule } from "@/server_action/getBusSchedule";
 import type { BusSchedule } from "@/type/busType";
@@ -91,75 +92,93 @@ const PopupInfo = ({
                         </button>
                     </div>
                 </div>
-                <div className="flex-grow min-h-0 w-full flex flex-col px-2">
-                    {hasFrequency && (
-                        <div className="flex flex-col gap-2">
-                            <p className="font-mono w-full p-1 border-b-[1px] border-white">
-                                Frequency
-                            </p>
-                            <div className="w-full grid grid-cols-2 gap-2">
-                                <div className="flex flex-col min-h-0">
-                                    {busSchedule
-                                        .find(
-                                            (d) =>
-                                                d.RouteName.Zh_tw === bus &&
-                                                d.Direction === 0
-                                        )
-                                        ?.Frequencys?.filter(
-                                            (d) =>
-                                                d.ServiceDay[
-                                                    dayOfAWeek[day]
-                                                ] === 1
-                                        )
-                                        ?.map((item, index) => {
-                                            return (
-                                                <div key={`0 ${index}`}>
-                                                    <span>{`${item.StartTime} ~ ${item.EndTime}`}</span>
-                                                    <span>{`最長班距：${item.MaxHeadwayMins}；最短班距：${item.MinHeadwayMins}`}</span>
-                                                </div>
-                                            );
-                                        })}
-                                </div>
-                                <div className="flex flex-col min-h-0">
-                                    {busSchedule
-                                        .find((d) => d.Direction === 1)
-                                        ?.Frequencys?.filter(
-                                            (d) =>
-                                                d.ServiceDay[
-                                                    dayOfAWeek[day]
-                                                ] === 1
-                                        )
-                                        ?.map((item, index) => {
-                                            return (
-                                                <div key={`1 ${index}`}>
-                                                    <span>{`${item.StartTime} ~ ${item.EndTime}`}</span>
-                                                    <span>{`最長班距：${item.MaxHeadwayMins}；最短班距：${item.MinHeadwayMins}`}</span>
-                                                </div>
-                                            );
-                                        })}
-                                </div>
-                                <div className="flex flex-col min-h-0"></div>
-                            </div>
-                        </div>
-                    )}
-                    {hasTimeTable && (
-                        <div className="flex flex-col gap-2">
-                            <p className="font-mono w-full p-1 border-b-[1px] border-white">
-                                Time Table
-                            </p>
-                            <div className="w-full grid grid-cols-2 gap-2">
-                                <div className="flex flex-col min-h-0">
-                                    {busSchedule.find(d => d.Direction === 0)?.Timetables?.filter(d => d.ServiceDay[dayOfAWeek[day]] === 1)?.map((item, index) => {
-                                        return (
-                                            <div key={`0 timetable ${index}`}>
-                                                <span>{item.StopTimes[0].DepartureTime}</span>
-                                            </div>
-                                        )
-                                    })}
+                <div className="flex-grow min-h-0 w-full flex flex-col p-2 ">
+                    <ScrollArea>
+                        {hasFrequency && (
+                            <div className="flex flex-col gap-2">
+                                <p className="font-mono w-full p-1 border-b-[1px] border-white">
+                                    Frequency
+                                </p>
+                                <div className="w-full grid grid-cols-2 gap-2">
+                                    <div className="flex flex-col min-h-0">
+                                        {busSchedule
+                                            .find(
+                                                (d) =>
+                                                    d.RouteName.Zh_tw === bus &&
+                                                    d.Direction === 0
+                                            )
+                                            ?.Frequencys?.filter(
+                                                (d) =>
+                                                    d.ServiceDay[
+                                                        dayOfAWeek[day]
+                                                    ] === 1
+                                            )
+                                            ?.map((item, index) => {
+                                                return (
+                                                    <div key={`0 ${index}`}>
+                                                        <span>{`${item.StartTime} ~ ${item.EndTime}`}</span>
+                                                        <span>{`最長班距：${item.MaxHeadwayMins}；最短班距：${item.MinHeadwayMins}`}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                    <div className="flex flex-col min-h-0">
+                                        {busSchedule
+                                            .find((d) => d.Direction === 1)
+                                            ?.Frequencys?.filter(
+                                                (d) =>
+                                                    d.ServiceDay[
+                                                        dayOfAWeek[day]
+                                                    ] === 1
+                                            )
+                                            ?.map((item, index) => {
+                                                return (
+                                                    <div key={`1 ${index}`}>
+                                                        <span>{`${item.StartTime} ~ ${item.EndTime}`}</span>
+                                                        <span>{`最長班距：${item.MaxHeadwayMins}；最短班距：${item.MinHeadwayMins}`}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                    <div className="flex flex-col min-h-0"></div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                        {hasTimeTable && (
+                            <div className="flex flex-col gap-2 min-h-0">
+                                <p className="font-mono w-full p-1 border-b-[1px] border-white">
+                                    Time Table
+                                </p>
+                                <div className="w-full grid grid-cols-2 gap-2">
+                                    <div className="flex flex-col min-h-0">
+                                        {busSchedule
+                                            .find((d) => d.Direction === 0)
+                                            ?.Timetables?.filter(
+                                                (d) =>
+                                                    d.ServiceDay[
+                                                        dayOfAWeek[day]
+                                                    ] === 1
+                                            )
+                                            ?.map((item, index) => {
+                                                return (
+                                                    <div
+                                                        key={`0 timetable ${index}`}
+                                                    >
+                                                        <span>
+                                                            {
+                                                                item
+                                                                    .StopTimes[0]
+                                                                    .DepartureTime
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </ScrollArea>
                 </div>
             </div>
         </Popup>

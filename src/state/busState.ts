@@ -38,6 +38,5 @@ export const overlayAtom = atomWithStorage<{
   "TaitungCounty": [],
   "PenghuCounty": [],
 });
-export const noteAtom = atomWithStorage("note", "");
 export const pageAtom = atom("");
 export const showCityOverlayAtom = atom<string[]>([])
