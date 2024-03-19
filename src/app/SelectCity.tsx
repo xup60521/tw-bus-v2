@@ -34,12 +34,12 @@ export default function SelectCity(): React.ReactNode {
               >
                 公車
               </Link>
-              <Link
+              {/* <Link
                 className="rounded-lg bg-sky-500 p-2 px-6 font-bold text-white transition-all hover:bg-sky-400"
                 href={`/route/${item.value}`}
               >
                 路線圖
-              </Link>
+              </Link> */}
               </Fragment>
             );
           }

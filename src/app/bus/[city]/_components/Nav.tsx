@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import ReactSelect from "react-select";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import Plan from "./Plan";
 
 const Overlay = dynamic(() => import("./Overlay"), { ssr: false });
 
@@ -125,6 +126,9 @@ export default function Nav({
                 if (page === "overlay") {
                     return <Overlay city={city} />;
                 }
+                if (page === "plan") {
+                    return <Plan city={city} />
+                }
                 return <Bus city={city} initBusList={initBusList} />;
             })()}
             <Controller city={city} router={router} />
@@ -173,7 +177,7 @@ const Controller = ({
                                 page === "bus" ? "bg-slate-100" : ""
                             }`}
                         >
-                            公車 Bus
+                            公車
                         </button>
                         <button
                             onClick={() => {
@@ -190,7 +194,24 @@ const Controller = ({
                                 page === "station" ? "bg-slate-100" : ""
                             }`}
                         >
-                            站牌 Station
+                            站牌
+                        </button>
+                        <button
+                            onClick={() => {
+                                setPage("plan");
+                                setOpenSheet(false);
+                                setURLSearchParams([
+                                    {
+                                        key: "page",
+                                        value: "plan",
+                                    },
+                                ]);
+                            }}
+                            className={`w-full transition-all hover:bg-slate-100 rounded-lg text-left p-2 px-3 ${
+                                page === "plan" ? "bg-slate-100" : ""
+                            }`}
+                        >
+                            路線規劃
                         </button>
                         <button
                             onClick={() => {
@@ -207,7 +228,7 @@ const Controller = ({
                                 page === "overlay" ? "bg-slate-100" : ""
                             }`}
                         >
-                            疊加 Overlay
+                            疊加
                         </button>
                     </div>
                     <SheetFooter>

@@ -1,4 +1,4 @@
-import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
+import type { BusGeo, BusOverlay, BusStops, SearchBus } from "@/type/busType";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
@@ -40,3 +40,7 @@ export const overlayAtom = atomWithStorage<{
 });
 export const pageAtom = atom("");
 export const showCityOverlayAtom = atom<string[]>([])
+
+export const planStartStationAtom = atom("")
+export const planEndStationAtom = atom("")
+export const planResultAtom = atom<SearchBus[] | null>(null)

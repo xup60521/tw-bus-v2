@@ -142,3 +142,10 @@ type StopTime = {
     ArrivalTime:   string;
     DepartureTime: string;
 }
+
+export type SearchBus = {
+    RouteName:  Name;
+    Direction:  number;
+    UpdateTime: string;
+    VersionID:  number;
+}
