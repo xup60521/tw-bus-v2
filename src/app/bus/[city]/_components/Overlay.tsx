@@ -144,7 +144,8 @@ export default function Overlay({ city }: { city: string }) {
                             key={`overlay page show list ${c}`}
                             busOverlay={busOverlay}
                             setBusOverlay={setBusOverlay}
-                            city={c}
+                            c={c}
+                            city={city}
                         />
                     );
                 })}
@@ -156,13 +157,15 @@ export default function Overlay({ city }: { city: string }) {
 const OverlayList = ({
     busOverlay,
     setBusOverlay,
-    city,
+    c,
+    city
 }: {
     busOverlay: { [key: string]: BusOverlay[] | undefined };
     setBusOverlay: SetAtom<
         [SetStateAction<{ [key: string]: BusOverlay[] | undefined }>],
         void
     >;
+    c: string;
     city: string;
 }) => {
     const setURLSearchParams = useSetURLSearchParams();
@@ -178,12 +181,12 @@ const OverlayList = ({
     ) => {
         setBusOverlay((prev) => {
             const filtered =
-                prev[city]?.filter(
+                prev[c]?.filter(
                     (item) =>
                         item.RouteName.Zh_tw !== name ||
                         item.Direction !== direction
                 ) ?? [];
-            prev[city] = filtered;
+            prev[c] = filtered;
             return { ...prev };
         });
         toast({
@@ -196,9 +199,9 @@ const OverlayList = ({
     return (
         <div className="flex w-full flex-col gap-1">
             <Badge className="w-fit mt-3 -mb-1">
-                {cityList.find((d) => d.value === city)?.label}
+                {cityList.find((d) => d.value === c)?.label}
             </Badge>
-            {busOverlay[city]?.map((item) => {
+            {busOverlay[c]?.map((item) => {
                 const stopLength = item.Stops.length;
                 const headSign = `${item.Stops[0].StopName.Zh_tw} - ${
                     item.Stops[stopLength - 1].StopName.Zh_tw
@@ -241,7 +244,8 @@ const OverlayList = ({
                             >
                                 <FaTrash />
                             </button>
-                            <DropdownMenu>
+
+                            {c === city && <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-white p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black">
                                         <FiMenu />
@@ -275,13 +279,13 @@ const OverlayList = ({
                                         <span>查看公車</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
-                            </DropdownMenu>
+                            </DropdownMenu>}
                             <Switch
                                 checked={item.ShowOverlay}
                                 className="-ml-2"
                                 onCheckedChange={(e) => {
                                     setBusOverlay((prev) => {
-                                        const newArr = prev[city]?.map((d) => {
+                                        const newArr = prev[c]?.map((d) => {
                                             if (
                                                 d.RouteName.Zh_tw ===
                                                     item.RouteName.Zh_tw &&
@@ -295,7 +299,7 @@ const OverlayList = ({
                                         if (!newArr) {
                                             return { ...prev };
                                         }
-                                        prev[city] = newArr;
+                                        prev[c] = newArr;
                                         return { ...prev };
                                     });
                                 }}
