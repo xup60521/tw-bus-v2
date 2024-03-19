@@ -252,6 +252,7 @@ const Controller = ({
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>切換顯示地區</DialogTitle>
+                        <DialogDescription>目前：{cityList.find(d => d.value === city)?.label}</DialogDescription>
                     </DialogHeader>
                     <ReactSelect
                         options={cityList}
