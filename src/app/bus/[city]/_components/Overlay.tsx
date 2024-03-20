@@ -389,11 +389,11 @@ const Alert = ({
         <AlertDialog open={openAlert} onOpenChange={(e) => setOpenAlert(e)}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>即將切換地區{` ${bus}`}</AlertDialogTitle>
+                    <AlertDialogTitle>即將切換地區</AlertDialogTitle>
                     <AlertDialogDescription>
-                        您欲察看的路線並不屬於
+                        {`${bus} `}路線並不屬於
                         {cityList.find((d) => d.value === city)?.label}
-                        公車，因此須轉移顯示地區到
+                        公車，因此須轉移區域到
                         {cityList.find((d) => d.value === c)?.label}
                         才能正常顯示
                     </AlertDialogDescription>
