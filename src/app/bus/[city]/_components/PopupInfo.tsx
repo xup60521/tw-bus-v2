@@ -54,7 +54,7 @@ const PopupInfo = ({
                         <IoIosClose />
                     </button>
                 </div>
-                <button
+                {/* <button
                     onClick={() =>
                         navigator.clipboard.writeText(
                             JSON.stringify(busSchedule)
@@ -62,7 +62,7 @@ const PopupInfo = ({
                     }
                 >
                     copy
-                </button>
+                </button> */}
                 <div className="w-full min-h-0 flex flex-col p-2">
                     <div className="w-full flex justify-between">
                         <button
@@ -100,12 +100,14 @@ const PopupInfo = ({
                                     Frequency
                                 </p>
                                 <div className="w-full grid grid-cols-2 gap-2">
-                                    <div className="flex flex-col min-h-0">
+                                    {["順向","逆向"].map((item, index) => {
+                                        return <div key={`1 ${index}`} className="flex flex-col min-h-0 gap-2">
+                                            <p>{item}</p>
                                         {busSchedule
                                             .find(
                                                 (d) =>
                                                     d.RouteName.Zh_tw === bus &&
-                                                    d.Direction === 0
+                                                    d.Direction === index
                                             )
                                             ?.Frequencys?.filter(
                                                 (d) =>
@@ -115,14 +117,25 @@ const PopupInfo = ({
                                             )
                                             ?.map((item, index) => {
                                                 return (
-                                                    <div key={`0 ${index}`}>
-                                                        <span>{`${item.StartTime} ~ ${item.EndTime}`}</span>
-                                                        <span>{`最長班距：${item.MaxHeadwayMins}；最短班距：${item.MinHeadwayMins}`}</span>
+                                                    <div
+                                                        key={`0 ${index}`}
+                                                        className="flex w-full"
+                                                    >
+                                                        <p className="w-32">
+                                                            {`${item.StartTime} ~ ${item.EndTime}`.padEnd(
+                                                                50
+                                                            )}
+                                                        </p>
+                                                        <div className="flex flex-wrap">
+                                                            <p className="w-28">{`最長班距：${item.MaxHeadwayMins}`}</p>
+                                                            <p className="w-28">{`最短班距：${item.MinHeadwayMins}`}</p>
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
                                     </div>
-                                    <div className="flex flex-col min-h-0">
+                                    })}
+                                    {/* <div className="flex flex-col min-h-0 gap-2">
                                         {busSchedule
                                             .find((d) => d.Direction === 1)
                                             ?.Frequencys?.filter(
@@ -133,13 +146,23 @@ const PopupInfo = ({
                                             )
                                             ?.map((item, index) => {
                                                 return (
-                                                    <div key={`1 ${index}`}>
-                                                        <span>{`${item.StartTime} ~ ${item.EndTime}`}</span>
-                                                        <span>{`最長班距：${item.MaxHeadwayMins}；最短班距：${item.MinHeadwayMins}`}</span>
+                                                    <div
+                                                        key={`1 ${index}`}
+                                                        className="flex w-full"
+                                                    >
+                                                        <p className="w-32">
+                                                            {`${item.StartTime} ~ ${item.EndTime}`.padEnd(
+                                                                50
+                                                            )}
+                                                        </p>
+                                                        <div className="flex flex-wrap">
+                                                            <p className="w-28">{`最長班距：${item.MaxHeadwayMins}`}</p>
+                                                            <p className="w-28">{`最短班距：${item.MinHeadwayMins}`}</p>
+                                                        </div>
                                                     </div>
                                                 );
                                             })}
-                                    </div>
+                                    </div> */}
                                     <div className="flex flex-col min-h-0"></div>
                                 </div>
                             </div>

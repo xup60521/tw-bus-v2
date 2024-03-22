@@ -35,7 +35,9 @@ import { FiMenu } from "react-icons/fi";
 import Popup from "reactjs-popup";
 import RemainningTime from "./RemainningTime";
 import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 
+const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Plan({ city }: { city: string }) {
     const [openPopup1, setOpenPopup1] = useState(false);
     const [openPopup2, setOpenPopup2] = useState(false);
@@ -47,6 +49,8 @@ export default function Plan({ city }: { city: string }) {
     const bus = searchParams.get("bus") ?? "";
     const direction = searchParams.get("direction") ?? "";
     const { toast } = useToast();
+    const [openInfo, setOpenInfo] = useState(false);
+    const [currentBus, setCurrentBus] = useState("");
 
     const handleSearchRoute = async () => {
         if (!planStartStation || !planEndStation) {
@@ -106,10 +110,18 @@ export default function Plan({ city }: { city: string }) {
                             bus={bus}
                             direction={direction}
                             list={searchResult}
+                            setOpenInfo={setOpenInfo}
+                            setCurrentBus={setCurrentBus}
                         />
                     </div>
                 </ScrollArea>
             </div>
+            <PopupInfo
+                city={city}
+                openPopup={openInfo}
+                setOpenPopup={setOpenInfo}
+                bus={currentBus}
+            />
             <PopupSetStation
                 city={city}
                 setStation={setPlanStartStation}
@@ -221,17 +233,22 @@ const BusList = ({
     bus,
     direction,
     city,
+    setOpenInfo,
+    setCurrentBus,
 }: {
     list?: SearchBus[] | null;
     bus: string;
     direction: string;
     city: string;
+    setOpenInfo: React.Dispatch<React.SetStateAction<boolean>>;
+    setCurrentBus: React.Dispatch<React.SetStateAction<string>>;
 }) => {
     const busOverlay = useAtomValue(overlayAtom);
     const add_remove_overlay = useOverlay({ city });
     const setURLSearchParams = useSetURLSearchParams();
     const setPage = useSetAtom(pageAtom);
-    let filteredList: { RouteName: {Zh_tw: string}; Direction: number }[] = [];
+    let filteredList: { RouteName: { Zh_tw: string }; Direction: number }[] =
+        [];
     list?.forEach((d) => {
         if (
             !!filteredList.find(
@@ -244,7 +261,7 @@ const BusList = ({
         }
         filteredList = [
             ...filteredList,
-            { RouteName: {Zh_tw: d.RouteName.Zh_tw}, Direction: d.Direction },
+            { RouteName: { Zh_tw: d.RouteName.Zh_tw }, Direction: d.Direction },
         ];
     });
 
@@ -316,6 +333,14 @@ const BusList = ({
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            setCurrentBus(item.RouteName.Zh_tw);
+                                            setOpenInfo(true);
+                                        }}
+                                    >
+                                        <span>發車資訊</span>
+                                    </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => {
                                             setPage("bus");

@@ -45,7 +45,9 @@ import { useOverlayColor } from "@/hooks/useOverlayColor";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import dynamic from "next/dynamic";
 
+const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Overlay({ city }: { city: string }) {
     const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
     const [showCityOverlay, setShowCityOverlay] = useAtom(showCityOverlayAtom);
@@ -192,8 +194,9 @@ const OverlayList = ({
     const setPage = useSetAtom(pageAtom);
     const getColor = useOverlayColor();
     const [openAlert, setOpenAlert] = useState(false);
-    const [currentBus, setCurrentBus] = useState("")
-    const [currentDirection, setCurrentDirection] = useState(0)
+    const [openPopup, setOpenPopup] = useState(false);
+    const [currentBus, setCurrentBus] = useState("");
+    const [currentDirection, setCurrentDirection] = useState(0);
 
     const handleRemove = (
         name: string,
@@ -218,95 +221,73 @@ const OverlayList = ({
     };
 
     return (
-        <div className="flex w-full flex-col gap-1">
-            <Badge className="w-fit mt-3 -mb-1">
-                {cityList.find((d) => d.value === c)?.label}
-            </Badge>
-            {busOverlay[c]?.map((item) => {
-                const stopLength = item.Stops.length;
-                const headSign = `${item.Stops[0].StopName.Zh_tw} - ${
-                    item.Stops[stopLength - 1].StopName.Zh_tw
-                }`;
-                return (
-                    <div
-                        key={`overlay ${item.RouteName.Zh_tw} ${item.Direction}`}
-                        className="flex w-full items-center gap-4"
-                    >
+        <>
+            <PopupInfo
+                city={c}
+                bus={currentBus}
+                openPopup={openPopup}
+                setOpenPopup={setOpenPopup}
+            />
+            <div className="flex w-full flex-col gap-1">
+                <Badge className="w-fit mt-3 -mb-1">
+                    {cityList.find((d) => d.value === c)?.label}
+                </Badge>
+                {busOverlay[c]?.map((item) => {
+                    const stopLength = item.Stops.length;
+                    const headSign = `${item.Stops[0].StopName.Zh_tw} - ${
+                        item.Stops[stopLength - 1].StopName.Zh_tw
+                    }`;
+                    return (
                         <div
-                            className="h-full text-transparent -mr-2"
-                            style={{
-                                backgroundColor: getColor(item.RouteName.Zh_tw),
-                            }}
+                            key={`overlay ${item.RouteName.Zh_tw} ${item.Direction}`}
+                            className="flex w-full items-center gap-4"
                         >
-                            |
-                        </div>
-                        <button
-                            onClick={() => {
-                                setTogglePolyline((prev) => ({
-                                    routeName: item.RouteName.Zh_tw,
-                                    direction: `${item.Direction}`,
-                                    id: prev.id + 1,
-                                }));
-                            }}
-                            className="relative group text-white p-1 text-left w-full"
-                        >
-                            <p>{item.RouteName.Zh_tw}</p>
-                            <p className="text-xs text-gray-300">{headSign}</p>
-                            <span
-                                className={`absolute -bottom-1 left-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
-                            ></span>
-                            <span
-                                className={`absolute -bottom-1 right-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
-                            ></span>
-                        </button>
-                        <div className="box-border flex w-max items-center gap-2">
+                            <div
+                                className="h-full text-transparent -mr-2"
+                                style={{
+                                    backgroundColor: getColor(
+                                        item.RouteName.Zh_tw
+                                    ),
+                                }}
+                            >
+                                |
+                            </div>
                             <button
                                 onClick={() => {
-                                    handleRemove(
-                                        item.RouteName.Zh_tw,
-                                        item.Direction,
-                                        headSign
-                                    );
+                                    setTogglePolyline((prev) => ({
+                                        routeName: item.RouteName.Zh_tw,
+                                        direction: `${item.Direction}`,
+                                        id: prev.id + 1,
+                                    }));
                                 }}
-                                className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-2 border-red-700 p-1 text-center font-bold text-red-700 transition-all hover:bg-red-700 hover:text-white"
+                                className="relative group text-white p-1 text-left w-full"
                             >
-                                <FaTrash />
+                                <p>{item.RouteName.Zh_tw}</p>
+                                <p className="text-xs text-gray-300">
+                                    {headSign}
+                                </p>
+                                <span
+                                    className={`absolute -bottom-1 left-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
+                                ></span>
+                                <span
+                                    className={`absolute -bottom-1 right-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
+                                ></span>
                             </button>
+                            <div className="box-border flex w-max items-center gap-2">
+                                <button
+                                    onClick={() => {
+                                        handleRemove(
+                                            item.RouteName.Zh_tw,
+                                            item.Direction,
+                                            headSign
+                                        );
+                                    }}
+                                    className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-2 border-red-700 p-1 text-center font-bold text-red-700 transition-all hover:bg-red-700 hover:text-white"
+                                >
+                                    <FaTrash />
+                                </button>
 
-                            {c === city ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-white p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black">
-                                            <FiMenu />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                            onClick={() => {
-                                                setPage("bus");
-                                                setURLSearchParams([
-                                                    {
-                                                        key: "bus",
-                                                        value: item.RouteName
-                                                            .Zh_tw,
-                                                    },
-                                                    {
-                                                        key: "direction",
-                                                        value: `${item.Direction}`,
-                                                    },
-                                                    {
-                                                        key: "page",
-                                                        value: "bus",
-                                                    },
-                                                ]);
-                                            }}
-                                        >
-                                            <span>查看公車</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ) : (
-                                <>
+                                {c === city ? (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-white p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black">
@@ -316,55 +297,115 @@ const OverlayList = ({
                                         <DropdownMenuContent>
                                             <DropdownMenuItem
                                                 onClick={() => {
-                                                    setCurrentBus(item.RouteName.Zh_tw)
-                                                    setCurrentDirection(item.Direction)
-                                                    setOpenAlert(true);
+                                                    setCurrentBus(
+                                                        item.RouteName.Zh_tw
+                                                    );
+                                                    setOpenPopup(true);
+                                                }}
+                                            >
+                                                <span>發車資訊</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setPage("bus");
+                                                    setURLSearchParams([
+                                                        {
+                                                            key: "bus",
+                                                            value: item
+                                                                .RouteName
+                                                                .Zh_tw,
+                                                        },
+                                                        {
+                                                            key: "direction",
+                                                            value: `${item.Direction}`,
+                                                        },
+                                                        {
+                                                            key: "page",
+                                                            value: "bus",
+                                                        },
+                                                    ]);
                                                 }}
                                             >
                                                 <span>查看公車</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                </>
-                            )}
-                            <Switch
-                                checked={item.ShowOverlay}
-                                className="-ml-2"
-                                onCheckedChange={(e) => {
-                                    setBusOverlay((prev) => {
-                                        const newArr = prev[c]?.map((d) => {
-                                            if (
-                                                d.RouteName.Zh_tw ===
-                                                    item.RouteName.Zh_tw &&
-                                                d.Direction === item.Direction
-                                            ) {
-                                                d.ShowOverlay = e;
+                                ) : (
+                                    <>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-white p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black">
+                                                    <FiMenu />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent>
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setCurrentBus(
+                                                            item.RouteName.Zh_tw
+                                                        );
+                                                        setOpenPopup(true);
+                                                    }}
+                                                >
+                                                    <span>發車資訊</span>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setCurrentBus(
+                                                            item.RouteName.Zh_tw
+                                                        );
+                                                        setCurrentDirection(
+                                                            item.Direction
+                                                        );
+                                                        setOpenAlert(true);
+                                                    }}
+                                                >
+                                                    <span>查看公車</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </>
+                                )}
+                                <Switch
+                                    checked={item.ShowOverlay}
+                                    className="-ml-2"
+                                    onCheckedChange={(e) => {
+                                        setBusOverlay((prev) => {
+                                            const newArr = prev[c]?.map((d) => {
+                                                if (
+                                                    d.RouteName.Zh_tw ===
+                                                        item.RouteName.Zh_tw &&
+                                                    d.Direction ===
+                                                        item.Direction
+                                                ) {
+                                                    d.ShowOverlay = e;
+                                                    return d;
+                                                }
                                                 return d;
+                                            });
+                                            if (!newArr) {
+                                                return { ...prev };
                                             }
-                                            return d;
-                                        });
-                                        if (!newArr) {
+                                            prev[c] = newArr;
                                             return { ...prev };
-                                        }
-                                        prev[c] = newArr;
-                                        return { ...prev };
-                                    });
-                                }}
-                            />
+                                        });
+                                    }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
-            <Alert
-                openAlert={openAlert}
-                setOpenAlert={setOpenAlert}
-                bus={currentBus}
-                direction={currentDirection}
-                router={router}
-                c={c}
-                city={city}
-            />
-        </div>
+                    );
+                })}
+                <Alert
+                    openAlert={openAlert}
+                    setOpenAlert={setOpenAlert}
+                    bus={currentBus}
+                    direction={currentDirection}
+                    router={router}
+                    c={c}
+                    city={city}
+                />
+            </div>
+        </>
     );
 };
 
