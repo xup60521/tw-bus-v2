@@ -99,7 +99,7 @@ const PopupInfo = ({
                                 <p className="font-mono w-full p-1 border-b-[1px] border-white">
                                     Frequency
                                 </p>
-                                <div className="w-full grid grid-cols-2 gap-2">
+                                <div className="w-full md:grid md:grid-cols-2 gap-2 md:flex-none flex flex-col">
                                     {["順向","逆向"].map((item, index) => {
                                         return <div key={`1 ${index}`} className="flex flex-col min-h-0 gap-2">
                                             <p>{item}</p>
