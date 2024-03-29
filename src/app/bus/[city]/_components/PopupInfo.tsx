@@ -1,6 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { dayOfAWeek } from "@/lib/utils";
-import { getInterCityBusSchedule } from "@/server_action/InterCity/getInterCityBusSchedule";
 import { getBusSchedule } from "@/server_action/getBusSchedule";
 import type { BusSchedule } from "@/type/busType";
 import { useEffect, useRef, useState } from "react";
@@ -31,12 +30,7 @@ const PopupInfo = ({
         }
     };
     useEffect(() => {
-        if (!openPopup) {
-            return;
-        }
-        if (city === "InterCity") {
-            getInterCityBusSchedule(bus).then((res) => setBusSchedule([...res]));
-        } else {
+        if (openPopup) {
             getBusSchedule(city, bus).then((res) => setBusSchedule([...res]));
         }
     }, [openPopup, bus]);

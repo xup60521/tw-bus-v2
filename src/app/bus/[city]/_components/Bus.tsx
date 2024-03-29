@@ -297,7 +297,7 @@ function DrawerSection({
                                 >
                                     取消選取
                                 </div>
-                                {data.map((item, index) => {
+                                {city !== "InterCity" ? data.map((item) => {
                                     return (
                                         <Fragment
                                             key={`fragment ${item.SubRoutes[0].SubRouteName.Zh_tw}`}
@@ -328,6 +328,40 @@ function DrawerSection({
                                             </div>
                                         </Fragment>
                                     );
+                                }) : data.map((d) => {
+                                    
+                                    return d.SubRoutes.map(item => {
+                                        return (
+                                            <Fragment
+                                                key={`fragment ${item.Direction} ${item.SubRouteName.Zh_tw}`}
+                                            >
+                                                <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
+    
+                                                <div
+                                                    onClick={() => {
+                                                        closeBtnRef.current?.click();
+                                                        setQString("");
+                                                        setDirection("0");
+                                                        setURLSearchParams([
+                                                            {
+                                                                key: "bus",
+                                                                value: item
+                                                                    .SubRouteName
+                                                                    .Zh_tw,
+                                                            },
+                                                            {
+                                                                key: "direction",
+                                                                value: `${item.Direction}`,
+                                                            },
+                                                        ]);
+                                                    }}
+                                                    className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                >
+                                                    {`${item.SubRouteName.Zh_tw} ${item.Headsign}`}
+                                                </div>
+                                            </Fragment>
+                                        );
+                                    })
                                 })}
                             </div>
                         </ScrollArea>

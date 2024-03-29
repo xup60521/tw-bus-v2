@@ -21,7 +21,7 @@ type SubRoute = {
   HolidayLastBusTime?: string;
 };
 
-type Name = {
+export type Name = {
   Zh_tw: string;
   En?: string;
 };
