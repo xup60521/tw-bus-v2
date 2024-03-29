@@ -4,7 +4,12 @@ import { LayersControl, MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
-import { busShapeAtom, busStopsAtom, overlayAtom, showCityOverlayAtom } from "@/state/busState";
+import {
+    busShapeAtom,
+    busStopsAtom,
+    overlayAtom,
+    showCityOverlayAtom,
+} from "@/state/busState";
 import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
 import ShowMarker from "./ShowMarker";
 import ShowPolyline from "./ShowPolyline";
@@ -12,7 +17,7 @@ import { DivIcon } from "leaflet";
 import { useOverlayColor } from "@/hooks/useOverlayColor";
 import { LinearToArray } from "@/lib/utils";
 
-export default function Map({ city }: { city: string }) {
+export default function Map() {
     const position = useMemo(
         () => ({ lat: 24.137396608878987, lng: 120.68692065044608 }), // [緯度, 經度]
         []
@@ -24,69 +29,100 @@ export default function Map({ city }: { city: string }) {
     const busShape = useAtomValue(busShapeAtom);
     const busStops = useAtomValue(busStopsAtom);
     const busOverlay = useAtomValue(overlayAtom);
-    const showCityOverlay = useAtomValue(showCityOverlayAtom)
+    const showCityOverlay = useAtomValue(showCityOverlayAtom);
 
     const baselayers = [
-        {name: 'OpenStreetMap.Mapnik', value: ('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')},
-        {name: 'OpenStreetMap.DE', value: ('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}}.png')},
-        {name: 'OpenStreetMap.CH', value: ('https://tile.osm.ch/switzerland/{z}/{x}/{y}.png')},
-        {name: 'OpenStreetMap.France', value:  ('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.}png')},
-        {name: 'OpenStreetMap.HOT', value: ('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png')},
-        {name: 'OpenStreetMap.BZH', value: ('https://tile.openstreetmap.bzh/br/{z}/{x}/{y}.png')},
-        {name: 'OpenTopoMap', value: ('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')}
-      ];
+        {
+            name: "OpenStreetMap.Mapnik",
+            value: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        },
+        {
+            name: "OpenStreetMap.DE",
+            value: "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}}.png",
+        },
+        {
+            name: "OpenStreetMap.CH",
+            value: "https://tile.osm.ch/switzerland/{z}/{x}/{y}.png",
+        },
+        {
+            name: "OpenStreetMap.France",
+            value: "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.}png",
+        },
+        {
+            name: "OpenStreetMap.HOT",
+            value: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+        },
+        {
+            name: "OpenStreetMap.BZH",
+            value: "https://tile.openstreetmap.bzh/br/{z}/{x}/{y}.png",
+        },
+        {
+            name: "OpenTopoMap",
+            value: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        },
+    ];
 
     return (
-        <>
-            <MapContainer
-                center={position}
-                zoom={8}
-                scrollWheelZoom={true}
-                className="z-0 h-full w-full"
-            >
-                {/* <TileLayer
+        <MapContainer
+            center={position}
+            zoom={8}
+            scrollWheelZoom={true}
+            className="z-0 h-full w-full"
+        >
+            {/* <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 /> */}
-                <LayersControl position="topright">
-                    {baselayers.map((item, index) => {
-                        return <LayersControl.BaseLayer checked={index === 0} name={item.name} key={item.name}>
-                            <TileLayer url={item.value} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />  
+            <LayersControl position="topright">
+                {baselayers.map((item, index) => {
+                    return (
+                        <LayersControl.BaseLayer
+                            checked={index === 0}
+                            name={item.name}
+                            key={item.name}
+                        >
+                            <TileLayer
+                                url={item.value}
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            />
                         </LayersControl.BaseLayer>
-                    })}
-                </LayersControl>
-                <FlyToCurrent />
-                <ShowPolyLines
-                    bus={bus}
-                    direction={direction}
-                    busShape={busShape}
-                    busStops={busStops}
-                />
-                <ShowStops
-                    bus={bus}
-                    direction={direction}
-                    busStops={busStops}
-                    station={station}
-                />
-                {showCityOverlay.map(c => {
-                    return <Fragment key={`showCityOverlay ${c}`}>
-
+                    );
+                })}
+            </LayersControl>
+            <FlyToCurrent />
+            <ShowPolyLines
+                bus={bus}
+                direction={direction}
+                busShape={busShape}
+                busStops={busStops}
+            />
+            <ShowStops
+                bus={bus}
+                direction={direction}
+                busStops={busStops}
+                station={station}
+            />
+            {showCityOverlay.map((c) => {
+                return (
+                    <Fragment key={`showCityOverlay ${c}`}>
                         <ShowOverlayPolylines
                             bus={bus}
                             direction={direction}
                             busOverlay={
-                                busOverlay[c]?.filter((d) => d.ShowOverlay) ?? []
+                                busOverlay[c]?.filter((d) => d.ShowOverlay) ??
+                                []
                             }
                         />
                         <ShowOverlayStops
                             busOverlay={
-                                busOverlay[c]?.filter((d) => d.ShowOverlay) ?? []
+                                busOverlay[c]?.filter((d) => d.ShowOverlay) ??
+                                []
                             }
                         />
                     </Fragment>
-                })}
-            </MapContainer>
-        </>
+                );
+            })}
+        </MapContainer>
     );
 }
 

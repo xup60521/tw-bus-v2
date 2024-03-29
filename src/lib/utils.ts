@@ -1,32 +1,40 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+    return twMerge(clsx(inputs));
 }
 
-export function RNN(a:string) {
-  const regex1 = /^[\u4e00-\u9fa5]/
-  const regex2 = /[\u4e00-\u9fa5][0-9]/
-  const regex3 = /[\u4e00-\u9fa5A-Z()]/g
-  return a.replace(regex1, "").replace(regex2, "").replace(regex3, "")
+export function RNN(a: string) {
+    const regex1 = /^[\u4e00-\u9fa5]/;
+    const regex2 = /[\u4e00-\u9fa5][0-9]/;
+    const regex3 = /[\u4e00-\u9fa5A-Z()]/g;
+    return a.replace(regex1, "").replace(regex2, "").replace(regex3, "");
 }
 
 export function LinearToArray(positionStr: string) {
-  const regex = /[A-Z()]/g;
-  const positionArr = positionStr
-    ?.replace(regex, "")
-    .split(",")
-    .map((f) =>
-      f
-        .split(" ")
-        .reverse()
-        .map((item) => Number(item))
-    ) as [number, number][];
-    return positionArr
+    const regex = /[A-Z()]/g;
+    const positionArr = positionStr
+        ?.replace(regex, "")
+        .split(",")
+        .map((f) =>
+            f
+                .split(" ")
+                .reverse()
+                .map((item) => Number(item))
+        ) as [number, number][];
+    return positionArr;
 }
 
-export const dayOfAWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+export const dayOfAWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 
 export const cityList = [
     { label: "台北市", value: "Taipei" },
@@ -50,4 +58,5 @@ export const cityList = [
     { label: "花蓮縣", value: "HualienCounty" },
     { label: "台東縣", value: "TaitungCounty" },
     { label: "澎湖縣", value: "PenghuCounty" },
-  ];
+    { label: "公路客運", value: "InterCity" },
+];

@@ -249,7 +249,7 @@ const Controller = ({
                 </SheetContent>
             </Sheet>
             <Dialog open={openDialog} onOpenChange={(e) => setOpenDialog(e)}>
-                <DialogContent>
+                <DialogContent className="-translate-y-48">
                     <DialogHeader>
                         <DialogTitle>切換顯示地區</DialogTitle>
                         <DialogDescription>目前：{cityList.find(d => d.value === city)?.label}</DialogDescription>

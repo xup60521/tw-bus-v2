@@ -31,7 +31,7 @@ export default function City({ params }: { params: { city: string } }) {
       {/* <DevTools /> */}
       <main className="w-screen h-screen flex md:flex-row relative flex-col gap-2 min-h-0 min-w-0 bg-slate-800 text-white md:p-2">
         <div className="md:h-full flex-grow md:rounded-md overflow-hidden bg-blue-800">
-          <Map city={city} />
+          <Map />
         </div>
         <button onClick={()=>setOpenNav(!openNav)} className="absolute left-4 md:block hidden bottom-4 rounded-full bg-gray-300 opacity-50 text-black transition-all hover:scale-125 p-2 px-4 text-md hover:opacity-100">{openNav ? "X" : "V"}</button>
         

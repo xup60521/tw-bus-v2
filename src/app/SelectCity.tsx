@@ -32,7 +32,7 @@ export default function SelectCity(): React.ReactNode {
                 className="rounded-lg bg-sky-500 p-2 px-6 font-bold text-white transition-all hover:bg-sky-400"
                 href={`/bus/${item.value}`}
               >
-                公車
+                進入
               </Link>
               {/* <Link
                 className="rounded-lg bg-sky-500 p-2 px-6 font-bold text-white transition-all hover:bg-sky-400"
