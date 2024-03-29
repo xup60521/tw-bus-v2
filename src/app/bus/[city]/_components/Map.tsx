@@ -1,6 +1,6 @@
 "use client";
 import { Fragment, useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { LayersControl, MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
@@ -26,6 +26,16 @@ export default function Map({ city }: { city: string }) {
     const busOverlay = useAtomValue(overlayAtom);
     const showCityOverlay = useAtomValue(showCityOverlayAtom)
 
+    const baselayers = [
+        {name: 'OpenStreetMap.Mapnik', value: ('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')},
+        {name: 'OpenStreetMap.DE', value: ('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}}.png')},
+        {name: 'OpenStreetMap.CH', value: ('https://tile.osm.ch/switzerland/{z}/{x}/{y}.png')},
+        {name: 'OpenStreetMap.France', value:  ('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.}png')},
+        {name: 'OpenStreetMap.HOT', value: ('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png')},
+        {name: 'OpenStreetMap.BZH', value: ('https://tile.openstreetmap.bzh/br/{z}/{x}/{y}.png')},
+        {name: 'OpenTopoMap', value: ('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')}
+      ];
+
     return (
         <>
             <MapContainer
@@ -34,10 +44,17 @@ export default function Map({ city }: { city: string }) {
                 scrollWheelZoom={true}
                 className="z-0 h-full w-full"
             >
-                <TileLayer
+                {/* <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-                />
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                /> */}
+                <LayersControl position="topright">
+                    {baselayers.map((item, index) => {
+                        return <LayersControl.BaseLayer checked={index === 0} name={item.name} key={item.name}>
+                            <TileLayer url={item.value} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />  
+                        </LayersControl.BaseLayer>
+                    })}
+                </LayersControl>
                 <FlyToCurrent />
                 <ShowPolyLines
                     bus={bus}
