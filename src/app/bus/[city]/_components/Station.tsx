@@ -37,7 +37,7 @@ export default function Station({ city }: { city: string }) {
     const data = useQuery({
         queryKey: ["routePassBy"],
         queryFn: () => getRoutePassBy(city, station),
-        enabled: !!station,
+        // enabled: !!station,
         refetchInterval: 15000,
     });
     const [openInfo, setOpenInfo] = useState(false);
@@ -60,7 +60,7 @@ export default function Station({ city }: { city: string }) {
                 </div>
                 <div className="w-full border-t-[1px] border-white"></div>
                 <ScrollArea className="w-full h-full">
-                    <div className="flex w-full flex-col gap-1 p-1">
+                    <div className="flex w-full flex-col gap-1 p-1 pl-0">
                         <BusList
                             city={city}
                             bus={bus}
@@ -218,6 +218,7 @@ const BusList = ({
                         >
                             <div className="h-full flex items-center gap-2">
                                 <RemainningTime
+                                StopStatus={item.StopStatus}
                                     EstimateTime={item.EstimateTime}
                                     NextBusTime={item.NextBusTime}
                                 />

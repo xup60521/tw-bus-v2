@@ -3,6 +3,7 @@
 import { RNN } from "@/lib/utils";
 import type { BusEst, BusList, BusStops } from "@/type/busType";
 import { Fragment, useEffect, useRef, useState } from "react";
+import { Virtuoso } from "react-virtuoso";
 import {
     Drawer,
     DrawerContent,
@@ -39,8 +40,10 @@ import { useSeparateStops } from "@/hooks/useSeparateStops";
 import RemainningTime from "./RemainningTime";
 import { FaInfo } from "react-icons/fa6";
 import dynamic from "next/dynamic";
+import "@/styles/scrollbar-drawer.css";
+// import scrollbar from "@/styles/scrollbar.module.css"
 
-const PopupInfo = dynamic(()=>import("./PopupInfo"), {ssr: false})
+const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Bus({
     city,
     initBusList,
@@ -51,7 +54,6 @@ export default function Bus({
     const setURLSearchParams = useSetURLSearchParams();
     const searchParams = useSearchParams();
     const bus = searchParams.get("bus") ?? "";
-    // const direction = searchParams.get("direction") ?? "";
     const [direction, setDirection] = useState(
         searchParams.get("direction") ?? ""
     );
@@ -60,7 +62,7 @@ export default function Bus({
     const busEst = useQuery({
         queryKey: ["busEst"],
         queryFn: () => getBusEst(city, bus),
-        enabled: !!bus,
+        // enabled: !!bus,
         refetchInterval: 15000,
     });
 
@@ -191,7 +193,7 @@ function DrawerSection({
     bus,
     setDirection,
     setURLSearchParams,
-    city
+    city,
 }: {
     initBusList: BusList[];
     open: boolean;
@@ -235,7 +237,13 @@ function DrawerSection({
 
     return (
         <>
-            <Drawer onClose={() => setOpen(false)} open={open}>
+            <Drawer
+                onClose={() => {
+                    setOpen(false);
+                    setQString("");
+                }}
+                open={open}
+            >
                 <DrawerContent
                     onInteractOutside={() => setOpen(false)}
                     onEscapeKeyDown={() => setOpen(false)}
@@ -276,28 +284,145 @@ function DrawerSection({
                                 }
                             }}
                         />
-                        <ScrollArea className="h-[60vh] w-full">
+                        <div className="h-[60vh] w-full">
                             <div className="w-full flex flex-col">
-                                <div
-                                    onClick={() => {
-                                        setURLSearchParams([
-                                            {
-                                                key: "bus",
-                                                value: "",
-                                            },
-                                            {
-                                                key: "direction",
-                                                value: "",
-                                            },
-                                        ]);
-                                        setDirection("");
-                                        setOpen(false);
-                                    }}
-                                    className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
-                                >
-                                    取消選取
-                                </div>
-                                {city !== "InterCity" ? data.map((item) => {
+                                {city !== "InterCity" ? (
+                                    <Virtuoso
+                                        style={{
+                                            height: "60vh",
+                                            overflowX: "hidden",
+                                        }}
+                                        totalCount={data.length + 1}
+                                        itemContent={(index) => {
+                                            if (index === 0) {
+                                                return (
+                                                    <div
+                                                        onClick={() => {
+                                                            setURLSearchParams([
+                                                                {
+                                                                    key: "bus",
+                                                                    value: "",
+                                                                },
+                                                                {
+                                                                    key: "direction",
+                                                                    value: "",
+                                                                },
+                                                            ]);
+                                                            setDirection("");
+                                                            setOpen(false);
+                                                        }}
+                                                        className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                    >
+                                                        取消選取
+                                                    </div>
+                                                );
+                                            }
+                                            const item = data[index - 1];
+                                            return (
+                                                <Fragment
+                                                    key={`fragment ${item.SubRoutes[0].SubRouteName.Zh_tw}`}
+                                                >
+                                                    <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
+
+                                                    <div
+                                                        onClick={() => {
+                                                            closeBtnRef.current?.click();
+                                                            setQString("");
+                                                            setDirection("0");
+                                                            setURLSearchParams([
+                                                                {
+                                                                    key: "bus",
+                                                                    value: item
+                                                                        .RouteName
+                                                                        .Zh_tw,
+                                                                },
+                                                                {
+                                                                    key: "direction",
+                                                                    value: "0",
+                                                                },
+                                                            ]);
+                                                        }}
+                                                        className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                    >
+                                                        {item.headSign}
+                                                    </div>
+                                                </Fragment>
+                                            );
+                                        }}
+                                    />
+                                ) : (
+                                    (() => {
+                                        const list = data.map((d) => {
+                                    
+                                            return d.SubRoutes.map(item => {
+                                                return (
+                                                    <Fragment
+                                                        key={`fragment ${item.Direction} ${item.SubRouteName.Zh_tw}`}
+                                                    >
+                                                        <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
+            
+                                                        <div
+                                                            onClick={() => {
+                                                                closeBtnRef.current?.click();
+                                                                setQString("");
+                                                                setDirection("0");
+                                                                setURLSearchParams([
+                                                                    {
+                                                                        key: "bus",
+                                                                        value: item
+                                                                            .SubRouteName
+                                                                            .Zh_tw,
+                                                                    },
+                                                                    {
+                                                                        key: "direction",
+                                                                        value: `${item.Direction}`,
+                                                                    },
+                                                                ]);
+                                                            }}
+                                                            className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                        >
+                                                            {`${item.SubRouteName.Zh_tw} ${item.Headsign}`}
+                                                        </div>
+                                                    </Fragment>
+                                                );
+                                            })
+                                        }).flat()
+                                        return <Virtuoso
+                                        style={{
+                                            height: "60vh",
+                                            overflowX: "hidden",
+                                        }}
+                                        totalCount={list.length + 1}
+                                        itemContent={index => {
+                                            if (index === 0) {
+                                                return (
+                                                    <div
+                                                        onClick={() => {
+                                                            setURLSearchParams([
+                                                                {
+                                                                    key: "bus",
+                                                                    value: "",
+                                                                },
+                                                                {
+                                                                    key: "direction",
+                                                                    value: "",
+                                                                },
+                                                            ]);
+                                                            setDirection("");
+                                                            setOpen(false);
+                                                        }}
+                                                        className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                    >
+                                                        取消選取
+                                                    </div>
+                                                );
+                                            }
+                                            return list[index-1]
+                                        }}
+                                        />;
+                                    })()
+                                )}
+                                {/* {city !== "InterCity" ? data.map((item) => {
                                     return (
                                         <Fragment
                                             key={`fragment ${item.SubRoutes[0].SubRouteName.Zh_tw}`}
@@ -362,9 +487,9 @@ function DrawerSection({
                                             </Fragment>
                                         );
                                     })
-                                })}
+                                })} */}
                             </div>
-                        </ScrollArea>
+                        </div>
 
                         <Button
                             variant="outline"
@@ -481,5 +606,3 @@ const StopList = ({
         </>
     );
 };
-
-
