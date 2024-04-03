@@ -281,9 +281,40 @@ const OverlayList = ({
                 setOpenPopup={setOpenPopup}
             />
             <div className="flex w-full flex-col gap-1">
-                <Badge className="w-fit mt-3 -mb-1">
-                    {cityList.find((d) => d.value === c)?.label}
-                </Badge>
+                <div className="flex mt-3 -mb-1 gap-2">
+                    <Badge className="w-fit">
+                        {cityList.find((d) => d.value === c)?.label}
+                    </Badge>
+                    <div className="flex  transition-all text-xs gap-2  items-center">
+                        <button className="text-gray-300 hover:text-orange-200" onClick={()=>{
+                            setBusOverlay(prev => {
+                                const data = prev[c]
+                                if (!data) {
+                                    return {...prev}
+                                }
+                                prev[c] = data.map(d => {
+                                    d.ShowOverlay = true
+                                    return d
+                                })
+                                return {...prev}
+                            })
+                        }}>全部顯示</button>
+                        <Separator orientation="vertical" />
+                        <button className="text-gray-300 hover:text-orange-200" onClick={()=>{
+                            setBusOverlay(prev => {
+                                const data = prev[c]
+                                if (!data) {
+                                    return {...prev}
+                                }
+                                prev[c] = data.map(d => {
+                                    d.ShowOverlay = false
+                                    return d
+                                })
+                                return {...prev}
+                            })
+                        }}>全部隱藏</button>
+                    </div>
+                </div>
                 {busOverlay[c]?.map((item) => {
                     const stopLength = item.Stops.length;
                     const headSign = `${item.Stops[0].StopName.Zh_tw} - ${

@@ -400,7 +400,7 @@ const ShowCityRailwayPolylines = ({
         const regex = /MULTILINESTRING/;
         const a =  cityRailwayToColor[c]
         const color = (a ? a[item.LineID] : undefined) ?? "#000"
-        const weight = 6
+        const weight = 3
         const opacity = 1
         if (regex.test(item.Geometry)) {
             const positionArr = MultilinearToArray(item.Geometry);
