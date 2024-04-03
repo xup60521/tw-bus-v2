@@ -213,7 +213,7 @@ const ShowPolyLines = ({
                     pathOptions={{
                         opacity: 0.6,
                         color,
-                        weight: 8,
+                        weight: 7,
                     }}
                     headSign={
                         thisStops
@@ -261,7 +261,7 @@ const ShowOverlayPolylines = ({
                         pathOptions={{
                             opacity: 0.7,
                             color,
-                            weight: 8,
+                            weight: 7,
                         }}
                         headSign={headSign}
                     />
