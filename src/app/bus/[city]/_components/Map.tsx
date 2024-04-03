@@ -7,15 +7,18 @@ import { useAtomValue } from "jotai";
 import {
     busShapeAtom,
     busStopsAtom,
+    cityRailwayOverlayAtom,
     overlayAtom,
     showCityOverlayAtom,
+    showCityRailwayOverlayAtom,
 } from "@/state/busState";
 import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
 import ShowMarker from "./ShowMarker";
 import ShowPolyline from "./ShowPolyline";
 import { DivIcon } from "leaflet";
 import { useOverlayColor } from "@/hooks/useOverlayColor";
-import { LinearToArray } from "@/lib/utils";
+import { LinearToArray, MultilinearToArray, cityRailwayToColor } from "@/lib/utils";
+import { CityRailwayGeo } from "@/type/cityRailwayType";
 
 export default function Map() {
     const position = useMemo(
@@ -29,12 +32,18 @@ export default function Map() {
     const busShape = useAtomValue(busShapeAtom);
     const busStops = useAtomValue(busStopsAtom);
     const busOverlay = useAtomValue(overlayAtom);
+    const cityRailwayOverlay = useAtomValue(cityRailwayOverlayAtom)
     const showCityOverlay = useAtomValue(showCityOverlayAtom);
+    const showCityRailwayOverlay = useAtomValue(showCityRailwayOverlayAtom);
 
     const baselayers = [
         {
             name: "OpenStreetMap.Mapnik",
             value: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        },
+        {
+            name: "OpenStreetMap.HOT",
+            value: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         },
         {
             name: "OpenStreetMap.DE",
@@ -47,10 +56,6 @@ export default function Map() {
         {
             name: "OpenStreetMap.France",
             value: "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.}png",
-        },
-        {
-            name: "OpenStreetMap.HOT",
-            value: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         },
         {
             name: "OpenStreetMap.BZH",
@@ -121,6 +126,11 @@ export default function Map() {
                         />
                     </Fragment>
                 );
+            })}
+            {showCityRailwayOverlay.map((c) => {
+                return <Fragment key={`showCityRailway ${c}`}>
+                    <ShowCityRailwayPolylines c={c} cityRailwayOverlay={cityRailwayOverlay[c]} />
+                </Fragment>;
             })}
         </MapContainer>
     );
@@ -374,4 +384,55 @@ const ShowStops = ({
     }
 
     return null;
+};
+
+const ShowCityRailwayPolylines = ({
+    cityRailwayOverlay,
+    c
+}: {
+    cityRailwayOverlay?: CityRailwayGeo[];
+    c: string;
+}) => {
+    if (!cityRailwayOverlay) {
+        return null;
+    }
+    return cityRailwayOverlay.map((item) => {
+        const regex = /MULTILINESTRING/;
+        const a =  cityRailwayToColor[c]
+        const color = (a ? a[item.LineID] : undefined) ?? "#000"
+        const weight = 6
+        const opacity = 1
+        if (regex.test(item.Geometry)) {
+            const positionArr = MultilinearToArray(item.Geometry);
+            return positionArr.map((d, i) => {
+                return (
+                    <ShowPolyline
+                        routeName={item.LineName.Zh_tw}
+                        key={`cityRailway polylines ${i} ${item.LineName}`}
+                        positions={d}
+                        pathOptions={{
+                            opacity,
+                            color,
+                            weight,
+                        }}
+                        headSign={item.LineName.Zh_tw}
+                    />
+                );
+            });
+        }
+        const positionArr = LinearToArray(item.Geometry)
+        return (
+            <ShowPolyline
+                routeName={item.LineName.Zh_tw}
+                key={`cityRailway ${item.LineName.Zh_tw}`}
+                positions={positionArr}
+                pathOptions={{
+                    opacity,
+                    color,
+                    weight,
+                }}
+                headSign={item.LineName.Zh_tw}
+            />
+        );
+    });
 };

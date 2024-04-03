@@ -28,11 +28,12 @@ import {
     overlayAtom,
     pageAtom,
     showCityOverlayAtom,
+    showCityRailwayOverlayAtom,
     togglePolylineAtom,
 } from "@/state/busState";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import { Switch } from "@/components/ui/switch";
-import { cityList } from "@/lib/utils";
+import { cityList, cityRailwayList } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
     Popover,
@@ -46,11 +47,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import dynamic from "next/dynamic";
+import { Separator } from "@/components/ui/separator";
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Overlay({ city }: { city: string }) {
     const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
     const [showCityOverlay, setShowCityOverlay] = useAtom(showCityOverlayAtom);
+    const [showCityRailwayOverlay, setShowCityRailwayOverlay] = useAtom(
+        showCityRailwayOverlayAtom
+    );
     const router = useRouter();
 
     return (
@@ -66,45 +71,92 @@ export default function Overlay({ city }: { city: string }) {
                         </button>
                     </PopoverTrigger>
                     <PopoverContent>
-                        <div className="flex flex-wrap w-full">
-                            {cityList.map((item) => {
-                                const checked = !!showCityOverlay.find(
-                                    (d) => d === item.value
-                                );
-                                return (
-                                    <div
-                                        key={`popupover-content ${item.label}`}
-                                        className="flex items-center p-1 gap-1"
-                                    >
-                                        <Checkbox
-                                            id={item.value}
-                                            checked={checked}
-                                            onClick={() => {
-                                                setShowCityOverlay((prev) => {
-                                                    if (
-                                                        prev.includes(
-                                                            item.value
-                                                        )
-                                                    ) {
-                                                        prev = prev.filter(
-                                                            (d) =>
-                                                                d !== item.value
-                                                        );
-                                                        return [...prev];
-                                                    }
-                                                    return [
-                                                        ...prev,
-                                                        item.value,
-                                                    ];
-                                                });
-                                            }}
-                                        />
-                                        <Label htmlFor={item.value}>
-                                            {item.label}
-                                        </Label>
-                                    </div>
-                                );
-                            })}
+                        <div className="flex flex-col gap-2 w-full">
+                            <div className="flex flex-wrap w-full">
+                                {cityList.map((item) => {
+                                    const checked = showCityOverlay.some(
+                                        (d) => d === item.value
+                                    );
+                                    return (
+                                        <div
+                                            key={`popupover-content ${item.label}`}
+                                            className="flex items-center p-1 gap-1"
+                                        >
+                                            <Checkbox
+                                                id={item.value}
+                                                checked={checked}
+                                                onClick={() => {
+                                                    setShowCityOverlay(
+                                                        (prev) => {
+                                                            if (
+                                                                prev.includes(
+                                                                    item.value
+                                                                )
+                                                            ) {
+                                                                return prev.filter(
+                                                                    (d) =>
+                                                                        d !==
+                                                                        item.value
+                                                                );
+                                                            }
+                                                            return [
+                                                                ...prev,
+                                                                item.value,
+                                                            ];
+                                                        }
+                                                    );
+                                                }}
+                                            />
+                                            <Label htmlFor={item.value}>
+                                                {item.label}
+                                            </Label>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <Separator />
+                            <div className="flex flex-wrap w-full">
+                                {cityRailwayList.map((item) => {
+                                    const checked = showCityRailwayOverlay.some(
+                                        (d) => d === item.value
+                                    );
+                                    return (
+                                        <div
+                                            key={`popover-content ${item.label}`}
+                                            className="flex items-center p-1 gap-1"
+                                        >
+                                            <Checkbox
+                                                id={item.value}
+                                                checked={checked}
+                                                onClick={() => {
+                                                    setShowCityRailwayOverlay(
+                                                        (prev) => {
+                                                            if (
+                                                                prev.includes(
+                                                                    item.value
+                                                                )
+                                                            ) {
+                                                                return prev.filter(
+                                                                    (d) =>
+                                                                        d !==
+                                                                        item.value
+                                                                );
+                                                            }
+                                                            return [
+                                                                ...prev,
+                                                                item.value,
+                                                            ];
+                                                        }
+                                                    );
+                                                }}
+                                            />
+                                            <Label htmlFor={item.value}>
+                                                {item.label}
+                                            </Label>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </PopoverContent>
                 </Popover>

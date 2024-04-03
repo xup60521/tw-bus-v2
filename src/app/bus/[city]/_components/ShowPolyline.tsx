@@ -17,7 +17,7 @@ export default function ShowPolyline({
   pathOptions: PathOptions;
   headSign: string;
   routeName: string;
-  direction: string;
+  direction?: string;
 }) {
   const togglePolyline = useAtomValue(togglePolylineAtom);
   const polylineRef = useRef<L.Polyline>(null)

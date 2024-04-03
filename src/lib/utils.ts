@@ -26,6 +26,51 @@ export function LinearToArray(positionStr: string) {
     return positionArr;
 }
 
+export function MultilinearToArray(positionStr: string) {
+    const regex1 = /MULTILINESTRING\(/;
+    const regex2 = /[()]/g;
+    const positionArr = positionStr
+        .replace(regex1, "")
+        .split("(")
+        .map((d) => d.replace(regex2, "").slice(0, -1))
+        .filter((d) => d)
+        .map((d) =>
+            d.split(",").map((i) =>
+                i
+                    .split(" ")
+                    .reverse()
+                    .map((a) => Number(a))
+            )
+        );
+    return positionArr as [number, number][][];
+}
+
+export const cityRailwayToColor = {
+    tp: {
+        BL: "#0070bd",
+        BR: "#c48c31",
+        G: "#008659",
+        O: "#f8b61c",
+        R: "#e3002c",
+        V: "#e5554f",
+        K: "#a28d5b",
+        Y: "#ffdb00"
+    },
+    ty: {
+        A: "#8246AF"
+    },
+    tc: {
+        G: "#8EC31C"
+    },
+    ks: {
+        O: "#faa73f",
+        R: "#e20b65",
+        C: "#7cbd52"
+    }
+} as { [districtCode: string]: {
+    [LineID: string]: string
+} | undefined }
+
 export const dayOfAWeek = [
     "Sunday",
     "Monday",
@@ -59,4 +104,11 @@ export const cityList = [
     { label: "台東縣", value: "TaitungCounty" },
     { label: "澎湖縣", value: "PenghuCounty" },
     { label: "公路客運", value: "InterCity" },
+];
+
+export const cityRailwayList = [
+    { label: "雙北捷運輕軌", value: "tp" },
+    { label: "桃園捷運", value: "ty" },
+    { label: "臺中捷運", value: "tc" },
+    { label: "高雄捷運輕軌", value: "ks" },
 ];

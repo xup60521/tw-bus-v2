@@ -7,7 +7,7 @@ import ReactQuery from "./_components/ReactQueryClient";
 import type { BusList } from "@/type/busType";
 import { getAllBus } from "@/server_action/getAllBus";
 import { useSetAtom } from "jotai";
-import { showCityOverlayAtom } from "@/state/busState";
+import { showCityOverlayAtom, showCityRailwayOverlayAtom } from "@/state/busState";
 // import { DevTools } from 'jotai-devtools'
 
 
@@ -17,12 +17,25 @@ export default function City({ params }: { params: { city: string } }) {
   const [openNav, setOpenNav] = useState(false);
   const [initBusList, setInitBusList] = useState<BusList[]>([]);
   const setShowCityOverlay = useSetAtom(showCityOverlayAtom)
+  const setCityRailwayOverlay = useSetAtom(showCityRailwayOverlayAtom)
   useEffect(() => {
     getAllBus(city).then((res: BusList[]) => {
       setInitBusList([...res]);
     });
     setOpenNav(true)
     setShowCityOverlay([city])
+    if (["Taipei", "NewTaipei", "Keelung"].includes(city)) {
+        setCityRailwayOverlay(["tp"])
+    }
+    if (city === "Taoyuan") {
+        setCityRailwayOverlay(["ty"])
+    }
+    if (["Taichung","ChanghuaCounty"].includes(city)) {
+        setCityRailwayOverlay(["tc"])
+    }
+    if (city === "Kaohsiung") {
+        setCityRailwayOverlay(["ks"])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

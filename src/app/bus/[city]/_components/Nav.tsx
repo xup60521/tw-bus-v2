@@ -9,7 +9,13 @@ import ReactQuery from "./ReactQueryClient";
 import { useEffect, useState } from "react";
 import { getAllBus } from "@/server_action/getAllBus";
 import { useHydrateAtoms } from "jotai/utils";
-import { busShapeAtom, busStopsAtom, pageAtom } from "@/state/busState";
+import {
+    busShapeAtom,
+    busStopsAtom,
+    cityRailwayOverlayAtom,
+    pageAtom,
+    showCityRailwayOverlayAtom,
+} from "@/state/busState";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getBusStops } from "@/server_action/getBusStops";
 import { getBusShape } from "@/server_action/getBusShape";
@@ -34,6 +40,7 @@ import {
 import ReactSelect from "react-select";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Plan from "./Plan";
+import { getLineGeo } from "@/server_action/cityRailway/getLineGeo";
 
 const Overlay = dynamic(() => import("./Overlay"), { ssr: false });
 
@@ -49,8 +56,13 @@ export default function Nav({
     const page = useAtomValue(pageAtom);
     const setBusShape = useSetAtom(busShapeAtom);
     const setBusStops = useSetAtom(busStopsAtom);
+    const [cityRailwayOverlay, setCityRailwayOverlay] = useAtom(
+        cityRailwayOverlayAtom
+    );
+    const showCityRailwayOverlay = useAtomValue(showCityRailwayOverlayAtom);
+
     const bus = searchParams.get("bus") ?? "";
-    const router = useRouter()
+    const router = useRouter();
 
     useEffect(() => {
         if (bus) {
@@ -117,6 +129,20 @@ export default function Nav({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bus]);
 
+    useEffect(() => {
+        let waitedforfetch = [...showCityRailwayOverlay];
+        Object.keys(cityRailwayOverlay).forEach((d) => {
+            if (waitedforfetch.includes(d)) {
+                waitedforfetch = waitedforfetch.filter((a) => a !== d);
+            }
+        });
+        if (waitedforfetch.length !== 0) {getLineGeo(waitedforfetch).then((res) => {
+            setCityRailwayOverlay((prev) => {
+                return { ...prev, ...res };
+            });
+        });}
+    }, [showCityRailwayOverlay]);
+
     return (
         <>
             {(() => {
@@ -127,7 +153,7 @@ export default function Nav({
                     return <Overlay city={city} />;
                 }
                 if (page === "plan") {
-                    return <Plan city={city} />
+                    return <Plan city={city} />;
                 }
                 return <Bus city={city} initBusList={initBusList} />;
             })()}
@@ -252,7 +278,10 @@ const Controller = ({
                 <DialogContent className="-translate-y-48">
                     <DialogHeader>
                         <DialogTitle>切換顯示地區</DialogTitle>
-                        <DialogDescription>目前：{cityList.find(d => d.value === city)?.label}</DialogDescription>
+                        <DialogDescription>
+                            目前：
+                            {cityList.find((d) => d.value === city)?.label}
+                        </DialogDescription>
                     </DialogHeader>
                     <ReactSelect
                         options={cityList}
@@ -261,9 +290,12 @@ const Controller = ({
                     />
                     {selectedCity && selectedCity !== city && (
                         <div className="flex justify-start">
-                            <button onClick={()=>{
-                                router.push(`/bus/${selectedCity}`)
-                            }} className="rounded-md bg-black px-3 py-2 text-white transition-all hover:bg-gray-700">
+                            <button
+                                onClick={() => {
+                                    router.push(`/bus/${selectedCity}`);
+                                }}
+                                className="rounded-md bg-black px-3 py-2 text-white transition-all hover:bg-gray-700"
+                            >
                                 進入
                             </button>
                         </div>
