@@ -25,6 +25,7 @@ export default function ShowPolyline({
     if (togglePolyline.routeName === routeName && togglePolyline.direction === direction) {
         polylineRef.current?.openPopup()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [togglePolyline]);
   return (
     <Polyline ref={polylineRef} positions={positions} pathOptions={pathOptions}>

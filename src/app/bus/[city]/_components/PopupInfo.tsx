@@ -33,6 +33,7 @@ const PopupInfo = ({
         if (openPopup) {
             getBusSchedule(city, bus).then((res) => setBusSchedule([...res]));
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [openPopup, bus]);
 
     const hasFrequency = !!busSchedule.find((d) => !!d.Frequencys);

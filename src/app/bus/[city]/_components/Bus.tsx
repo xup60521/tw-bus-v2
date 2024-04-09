@@ -83,6 +83,7 @@ export default function Bus({
 
     useEffect(() => {
         busEst.refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bus]);
 
     return (

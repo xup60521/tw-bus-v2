@@ -141,6 +141,7 @@ export default function Nav({
                 return { ...prev, ...res };
             });
         });}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showCityRailwayOverlay]);
 
     return (
