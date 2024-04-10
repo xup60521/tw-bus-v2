@@ -42,7 +42,7 @@ export const overlayAtom = atomWithStorage<{
 });
 export const cityRailwayOverlayAtom = atomWithStorage<{
     [key: string]: CityRailwayOverlay[] | undefined;
-}>("CityRailway", {});
+}>("railway_overlay", {});
 export const showCityOverlayAtom = atom<string[]>([]);
 export const showCityRailwayOverlayAtom = atom<string[]>([]);
 
