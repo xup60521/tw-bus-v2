@@ -49,12 +49,13 @@ export const cityRailwayToColor = {
     tp: {
         BL: "#0070bd",
         BR: "#c48c31",
+        MK: "#77bc1f",
         G: "#008659",
         O: "#f8b61c",
         R: "#e3002c",
         V: "#e5554f",
         K: "#a28d5b",
-        Y: "#ffdb00"
+        Y: "#ffdb00",
     },
     ty: {
         A: "#8246AF"

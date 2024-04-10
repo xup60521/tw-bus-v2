@@ -1,6 +1,14 @@
 "use client";
 import { Fragment, useEffect, useMemo } from "react";
-import { LayersControl, MapContainer, TileLayer, useMap } from "react-leaflet";
+import {
+    LayersControl,
+    MapContainer,
+    Marker,
+    Popup,
+    TileLayer,
+    Tooltip,
+    useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
@@ -17,8 +25,12 @@ import ShowMarker from "./ShowMarker";
 import ShowPolyline from "./ShowPolyline";
 import { DivIcon } from "leaflet";
 import { useOverlayColor } from "@/hooks/useOverlayColor";
-import { LinearToArray, MultilinearToArray, cityRailwayToColor } from "@/lib/utils";
-import { CityRailwayGeo } from "@/type/cityRailwayType";
+import {
+    LinearToArray,
+    MultilinearToArray,
+    cityRailwayToColor,
+} from "@/lib/utils";
+import { CityRailwayGeo, CityRailwayStation } from "@/type/cityRailwayType";
 
 export default function Map() {
     const position = useMemo(
@@ -32,7 +44,7 @@ export default function Map() {
     const busShape = useAtomValue(busShapeAtom);
     const busStops = useAtomValue(busStopsAtom);
     const busOverlay = useAtomValue(overlayAtom);
-    const cityRailwayOverlay = useAtomValue(cityRailwayOverlayAtom)
+    const cityRailwayOverlay = useAtomValue(cityRailwayOverlayAtom);
     const showCityOverlay = useAtomValue(showCityOverlayAtom);
     const showCityRailwayOverlay = useAtomValue(showCityRailwayOverlayAtom);
 
@@ -74,7 +86,6 @@ export default function Map() {
             scrollWheelZoom={true}
             className="z-0 h-full w-full"
         >
-            
             <LayersControl position="topright">
                 {baselayers.map((item, index) => {
                     return (
@@ -125,9 +136,20 @@ export default function Map() {
                 );
             })}
             {showCityRailwayOverlay.map((c) => {
-                return <Fragment key={`showCityRailway ${c}`}>
-                    <ShowCityRailwayPolylines c={c} cityRailwayOverlay={cityRailwayOverlay[c]} />
-                </Fragment>;
+                return (
+                    <Fragment key={`showCityRailway ${c}`}>
+                        <ShowCityRailwayPolylines
+                            c={c}
+                            cityRailwayOverlay={cityRailwayOverlay[c]?.geo}
+                        />
+                        <ShowCityRailwayStations
+                            cityRailwayStations={
+                                cityRailwayOverlay[c]?.stations
+                            }
+                            c={c}
+                        />
+                    </Fragment>
+                );
             })}
         </MapContainer>
     );
@@ -267,6 +289,7 @@ const ShowOverlayPolylines = ({
         </>
     );
 };
+
 const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
     const flatall = busOverlay
         .filter((d) => d.ShowOverlay)
@@ -385,7 +408,7 @@ const ShowStops = ({
 
 const ShowCityRailwayPolylines = ({
     cityRailwayOverlay,
-    c
+    c,
 }: {
     cityRailwayOverlay?: CityRailwayGeo[];
     c: string;
@@ -395,10 +418,10 @@ const ShowCityRailwayPolylines = ({
     }
     return cityRailwayOverlay.map((item) => {
         const regex = /MULTILINESTRING/;
-        const a =  cityRailwayToColor[c]
-        const color = (a ? a[item.LineID] : undefined) ?? "#000"
-        const weight = 3
-        const opacity = 1
+        const a = cityRailwayToColor[c];
+        const color = (a ? a[item.LineID] : undefined) ?? "#000";
+        const weight = 3;
+        const opacity = 1;
         if (regex.test(item.Geometry)) {
             const positionArr = MultilinearToArray(item.Geometry);
             return positionArr.map((d, i) => {
@@ -417,7 +440,7 @@ const ShowCityRailwayPolylines = ({
                 );
             });
         }
-        const positionArr = LinearToArray(item.Geometry)
+        const positionArr = LinearToArray(item.Geometry);
         return (
             <ShowPolyline
                 routeName={item.LineName.Zh_tw}
@@ -430,6 +453,109 @@ const ShowCityRailwayPolylines = ({
                 }}
                 headSign={item.LineName.Zh_tw}
             />
+        );
+    });
+};
+const ShowCityRailwayStations = ({
+    cityRailwayStations,
+    c,
+}: {
+    cityRailwayStations?: CityRailwayStation[];
+    c: string;
+}) => {
+    if (!cityRailwayStations) {
+        return null;
+    }
+    const allStationName = cityRailwayStations
+        .map((item) => {
+            return item.StationName.Zh_tw;
+        })
+        .filter((d, i, arr) => {
+            if (arr.indexOf(d) === i) {
+                return true;
+            }
+            return false;
+        });
+    return allStationName.map((item) => {
+        let IDs = [] as string[];
+        cityRailwayStations.forEach((d) => {
+            if (d.StationName.Zh_tw === item) {
+                IDs = [...IDs, d.StationID];
+            }
+        });
+        const thisData = cityRailwayStations.find(
+            (d) => d.StationName.Zh_tw === item
+        );
+        if (!thisData) {
+            return null;
+        }
+        const a = cityRailwayToColor[c] ?? {};
+        const colors = IDs.map((d) => {
+            let itm = { color: "", name: "" };
+            Object.keys(a ?? {})
+                .sort((a, b) => -a.length + b.length)
+                .some((data) => {
+                    if (d.includes(data) && a[data]) {
+                        itm.color = a[data];
+                        itm.name = d;
+                        return true;
+                    }
+                    return false;
+                });
+            return itm;
+        }).filter((d) => d.name);
+        if (c === "tc" && colors.length === 0) {
+            colors.unshift({
+                color: cityRailwayToColor?.tc?.G ?? "",
+                name: "G",
+            });
+        }
+        let h = "";
+        colors.forEach((color) => {
+            h += `<span style="display: block;border-radius: 0.25rem;
+        background-color: white; width: 1rem; height: 1rem;
+        position: relative; border: 0.25rem solid ${color.color}; flex-shrink: 0"></span>`;
+        });
+        h = `<div style="display: flex;width: fit-content; transform: translate(-50%, -50%);">${h}</div>`;
+        const icon = new DivIcon({
+            className: "city-railway-icon",
+            iconAnchor: [0, 0],
+            popupAnchor: [0, -12],
+            html: h,
+        });
+        return (
+            <Marker
+                icon={icon}
+                position={[
+                    thisData.StationPosition.PositionLat,
+                    thisData.StationPosition.PositionLon,
+                ]}
+                key={`city railway station ${thisData.StationName.Zh_tw}`}
+            >
+                <Popup>
+                    <div className="flex gap-2 items-center h-6">
+                        <p className="py-0">{`${thisData.StationName.Zh_tw}`}</p>
+                        <p className="flex gap-1 items-center py-0">
+                            {colors.map((item) => {
+                                return (
+                                    <span
+                                        key={`${thisData.StationName.Zh_tw} ${item.name}`}
+                                        className="text-white p-1 rounded-md px-2 text-xs font-bold"
+                                        style={{backgroundColor: item.color}}
+                                    >
+                                        {item.name}
+                                    </span>
+                                );
+                            })}
+                        </p>
+                    </div>
+                </Popup>
+                <Tooltip direction="bottom">
+                    <div>
+                        <p>{`${thisData.StationName.Zh_tw}`}</p>
+                    </div>
+                </Tooltip>
+            </Marker>
         );
     });
 };

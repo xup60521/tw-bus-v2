@@ -24,8 +24,8 @@ export default function City({ params }: { params: { city: string } }) {
     });
     setOpenNav(true)
     setShowCityOverlay([city])
-    if (["Taipei", "NewTaipei", "Keelung"].includes(city)) {
-        setCityRailwayOverlay(["tp"])
+    if (["Taipei", "NewTaipei"].includes(city)) {
+        setCityRailwayOverlay(["tp", "ty"])
     }
     if (city === "Taoyuan") {
         setCityRailwayOverlay(["ty"])
