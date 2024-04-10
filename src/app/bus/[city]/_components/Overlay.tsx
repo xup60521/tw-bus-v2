@@ -25,6 +25,7 @@ import { useAtom, type SetStateAction, useSetAtom } from "jotai";
 import { FaTrash } from "react-icons/fa6";
 import { FiMenu } from "react-icons/fi";
 import {
+    cityRailwayOverlayAtom,
     overlayAtom,
     pageAtom,
     showCityOverlayAtom,
@@ -33,7 +34,7 @@ import {
 } from "@/state/busState";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import { Switch } from "@/components/ui/switch";
-import { cityList, cityRailwayList } from "@/lib/utils";
+import { cityList, cityRailwayList, cityRailwayToColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
     Popover,
@@ -48,10 +49,14 @@ import { useRouter } from "next/navigation";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import dynamic from "next/dynamic";
 import { Separator } from "@/components/ui/separator";
+import { CityRailwayOverlay } from "@/type/cityRailwayType";
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Overlay({ city }: { city: string }) {
     const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
+    const [cityRailwayOverlay, setCityRailwayOverlay] = useAtom(
+        cityRailwayOverlayAtom
+    );
     const [showCityOverlay, setShowCityOverlay] = useAtom(showCityOverlayAtom);
     const [showCityRailwayOverlay, setShowCityRailwayOverlay] = useAtom(
         showCityRailwayOverlayAtom
@@ -178,6 +183,19 @@ export default function Overlay({ city }: { city: string }) {
                                 });
                                 return { ...prev };
                             });
+                            setCityRailwayOverlay((prev) => {
+                                showCityRailwayOverlay.forEach((c) => {
+                                    const newArr = prev[c]?.map((d) => {
+                                        d.ShowOverlay = true;
+                                        return d;
+                                    });
+                                    if (!newArr) {
+                                        return { ...prev };
+                                    }
+                                    prev[c] = newArr;
+                                });
+                                return { ...prev };
+                            });
                         }}
                     >
                         全部顯示
@@ -199,6 +217,19 @@ export default function Overlay({ city }: { city: string }) {
                                 });
                                 return { ...prev };
                             });
+                            setCityRailwayOverlay((prev) => {
+                                showCityRailwayOverlay.forEach((c) => {
+                                    const newArr = prev[c]?.map((d) => {
+                                        d.ShowOverlay = false;
+                                        return d;
+                                    });
+                                    if (!newArr) {
+                                        return { ...prev };
+                                    }
+                                    prev[c] = newArr;
+                                });
+                                return { ...prev };
+                            });
                         }}
                     >
                         全部隱藏
@@ -207,6 +238,16 @@ export default function Overlay({ city }: { city: string }) {
             </div>
             <div className="w-full border-t-[1px] border-white"></div>
             <ScrollArea className="w-full h-full p-1 pr-3">
+                {showCityRailwayOverlay.map((c) => {
+                    return (
+                        <CityRailwayOverlayList
+                            key={`city railway overlay ${c}`}
+                            c={c}
+                            cityRailwayOverlay={cityRailwayOverlay[c]}
+                            setCityRailwayOverlay={setCityRailwayOverlay}
+                        />
+                    );
+                })}
                 {showCityOverlay.map((c) => {
                     return (
                         <OverlayList
@@ -286,33 +327,43 @@ const OverlayList = ({
                         {cityList.find((d) => d.value === c)?.label}
                     </Badge>
                     <div className="flex  transition-all text-xs gap-2  items-center">
-                        <button className="text-gray-300 hover:text-orange-200" onClick={()=>{
-                            setBusOverlay(prev => {
-                                const data = prev[c]
-                                if (!data) {
-                                    return {...prev}
-                                }
-                                prev[c] = data.map(d => {
-                                    d.ShowOverlay = true
-                                    return d
-                                })
-                                return {...prev}
-                            })
-                        }}>全部顯示</button>
+                        <button
+                            className="text-gray-300 hover:text-orange-200"
+                            onClick={() => {
+                                setBusOverlay((prev) => {
+                                    const data = prev[c];
+                                    if (!data) {
+                                        return { ...prev };
+                                    }
+                                    prev[c] = data.map((d) => {
+                                        d.ShowOverlay = true;
+                                        return d;
+                                    });
+                                    return { ...prev };
+                                });
+                            }}
+                        >
+                            全部顯示
+                        </button>
                         <Separator orientation="vertical" />
-                        <button className="text-gray-300 hover:text-orange-200" onClick={()=>{
-                            setBusOverlay(prev => {
-                                const data = prev[c]
-                                if (!data) {
-                                    return {...prev}
-                                }
-                                prev[c] = data.map(d => {
-                                    d.ShowOverlay = false
-                                    return d
-                                })
-                                return {...prev}
-                            })
-                        }}>全部隱藏</button>
+                        <button
+                            className="text-gray-300 hover:text-orange-200"
+                            onClick={() => {
+                                setBusOverlay((prev) => {
+                                    const data = prev[c];
+                                    if (!data) {
+                                        return { ...prev };
+                                    }
+                                    prev[c] = data.map((d) => {
+                                        d.ShowOverlay = false;
+                                        return d;
+                                    });
+                                    return { ...prev };
+                                });
+                            }}
+                        >
+                            全部隱藏
+                        </button>
                     </div>
                 </div>
                 {busOverlay[c]?.map((item) => {
@@ -489,6 +540,139 @@ const OverlayList = ({
                 />
             </div>
         </>
+    );
+};
+
+const CityRailwayOverlayList = ({
+    c,
+    cityRailwayOverlay,
+    setCityRailwayOverlay,
+}: {
+    c: string;
+    cityRailwayOverlay?: CityRailwayOverlay[];
+    setCityRailwayOverlay: SetAtom<
+        [
+            SetStateAction<{
+                [key: string]: CityRailwayOverlay[] | undefined;
+            }>
+        ],
+        void
+    >;
+}) => {
+    const setTogglePolyline = useSetAtom(togglePolylineAtom);
+    const name = cityRailwayList.find((d) => d.value === c)?.label;
+    return (
+        <div className="flex w-full flex-col gap-1">
+            <div className="flex mt-3 -mb-1 gap-2">
+                <Badge className="w-fit">{name}</Badge>
+                <div className="flex  transition-all text-xs gap-2  items-center">
+                    <button
+                        onClick={() => {
+                            setCityRailwayOverlay((prev) => {
+                                const newArr = prev[c]?.map((item) => {
+                                    item.ShowOverlay = true;
+                                    return item;
+                                });
+                                if (!newArr) {
+                                    return { ...prev };
+                                }
+                                prev[c] = newArr;
+                                return { ...prev };
+                            });
+                        }}
+                        className="text-gray-300 hover:text-orange-200"
+                    >
+                        全部顯示
+                    </button>
+                    <Separator orientation="vertical" />
+                    <button
+                        onClick={() => {
+                            setCityRailwayOverlay((prev) => {
+                                const newArr = prev[c]?.map((item) => {
+                                    item.ShowOverlay = false;
+                                    return item;
+                                });
+                                if (!newArr) {
+                                    return { ...prev };
+                                }
+                                prev[c] = newArr;
+                                return { ...prev };
+                            });
+                        }}
+                        className="text-gray-300 hover:text-orange-200"
+                    >
+                        全部隱藏
+                    </button>
+                </div>
+            </div>
+            {cityRailwayOverlay?.map((item) => {
+                const a = cityRailwayToColor[c];
+                const color = a ? a[item.LineID] : "";
+                const headSign = `${item.Stations[0].StationName.Zh_tw} - ${
+                    item.Stations[item.Stations.length - 1].StationName.Zh_tw
+                }`;
+                return (
+                    <div
+                        key={`cityRailway overlay ${item.LineName.Zh_tw}`}
+                        className="flex w-full items-center gap-4"
+                    >
+                        <div
+                            className="h-full text-transparent -mr-2"
+                            style={{
+                                backgroundColor: color,
+                            }}
+                        >
+                            |
+                        </div>
+                        <button
+                            onClick={() => {
+                                setTogglePolyline((prev) => {
+                                    prev.routeName = item.LineName.Zh_tw;
+                                    prev.direction = undefined;
+                                    prev.id = prev.id > 10 ? 1 : prev.id++;
+                                    return { ...prev };
+                                });
+                            }}
+                            className="relative group text-white p-1 text-left w-full"
+                        >
+                            <p>{item.LineName.Zh_tw}</p>
+                            <p className="text-xs text-gray-300">{headSign}</p>
+                            <span
+                                className={`absolute -bottom-1 left-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
+                            ></span>
+                            <span
+                                className={`absolute -bottom-1 right-1/2 w-0 h-0.5 bg-red-400 group-hover:w-1/2 group-hover:transition-all`}
+                            ></span>
+                        </button>
+                        <div className="box-border flex w-max items-center gap-2">
+                            <Switch
+                                checked={item.ShowOverlay}
+                                className="-ml-2"
+                                onCheckedChange={(e) => {
+                                    setCityRailwayOverlay((prev) => {
+                                        const newArr = prev[c]?.map((d) => {
+                                            if (
+                                                d.LineName.Zh_tw ===
+                                                item.LineName.Zh_tw
+                                            ) {
+                                                d.ShowOverlay = e;
+                                                return d;
+                                            }
+                                            return d;
+                                        });
+                                        if (!newArr) {
+                                            return { ...prev };
+                                        }
+                                        prev[c] = newArr;
+                                        return { ...prev };
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
     );
 };
 

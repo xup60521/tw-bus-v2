@@ -1,5 +1,5 @@
 import type { BusGeo, BusOverlay, BusStops, SearchBus } from "@/type/busType";
-import type { CityRailwayGeo, CityRailwayStation } from "@/type/cityRailwayType";
+import type { CityRailwayGeo, CityRailwayOverlay, CityRailwayStation } from "@/type/cityRailwayType";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
@@ -41,7 +41,7 @@ export const overlayAtom = atomWithStorage<{
     PenghuCounty: [],
 });
 export const cityRailwayOverlayAtom = atomWithStorage<{
-    [key: string]: (CityRailwayGeo & {Stations: CityRailwayStation[]})[] | undefined;
+    [key: string]: CityRailwayOverlay[] | undefined;
 }>("CityRailway", {});
 export const showCityOverlayAtom = atom<string[]>([]);
 export const showCityRailwayOverlayAtom = atom<string[]>([]);

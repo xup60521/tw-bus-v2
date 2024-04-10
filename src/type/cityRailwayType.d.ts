@@ -12,6 +12,11 @@ type Name = {
     En?: string;
 };
 
+export type CityRailwayOverlay = CityRailwayGeo & {
+    Stations: CityRailwayStation[];
+    ShowOverlay?: boolean;
+};
+
 export type CityRailwayStation = {
     StationID: string;
     StationName: Name;
