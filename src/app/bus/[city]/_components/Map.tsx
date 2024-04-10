@@ -140,12 +140,10 @@ export default function Map() {
                     <Fragment key={`showCityRailway ${c}`}>
                         <ShowCityRailwayPolylines
                             c={c}
-                            cityRailwayOverlay={cityRailwayOverlay[c]?.geo}
+                            cityRailwayOverlay={cityRailwayOverlay[c]}
                         />
                         <ShowCityRailwayStations
-                            cityRailwayStations={
-                                cityRailwayOverlay[c]?.stations
-                            }
+                            cityRailwayStations={cityRailwayOverlay[c]}
                             c={c}
                         />
                     </Fragment>
@@ -410,7 +408,7 @@ const ShowCityRailwayPolylines = ({
     cityRailwayOverlay,
     c,
 }: {
-    cityRailwayOverlay?: CityRailwayGeo[];
+    cityRailwayOverlay?: (CityRailwayGeo & {Stations: CityRailwayStation[]})[];
     c: string;
 }) => {
     if (!cityRailwayOverlay) {
@@ -460,13 +458,14 @@ const ShowCityRailwayStations = ({
     cityRailwayStations,
     c,
 }: {
-    cityRailwayStations?: CityRailwayStation[];
+    cityRailwayStations?: (CityRailwayGeo & {Stations: CityRailwayStation[]})[];
     c: string;
 }) => {
     if (!cityRailwayStations) {
         return null;
     }
-    const allStationName = cityRailwayStations
+    const flatStations = cityRailwayStations.map(d => d.Stations).flat()
+    const allStationName = flatStations
         .map((item) => {
             return item.StationName.Zh_tw;
         })
@@ -478,12 +477,12 @@ const ShowCityRailwayStations = ({
         });
     return allStationName.map((item) => {
         let IDs = [] as string[];
-        cityRailwayStations.forEach((d) => {
+        flatStations.forEach((d) => {
             if (d.StationName.Zh_tw === item) {
                 IDs = [...IDs, d.StationID];
             }
         });
-        const thisData = cityRailwayStations.find(
+        const thisData = flatStations.find(
             (d) => d.StationName.Zh_tw === item
         );
         if (!thisData) {
@@ -541,7 +540,7 @@ const ShowCityRailwayStations = ({
                                     <span
                                         key={`${thisData.StationName.Zh_tw} ${item.name}`}
                                         className="text-white p-1 rounded-md px-2 text-xs font-bold"
-                                        style={{backgroundColor: item.color}}
+                                        style={{ backgroundColor: item.color }}
                                     >
                                         {item.name}
                                     </span>

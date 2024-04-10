@@ -41,7 +41,7 @@ export const overlayAtom = atomWithStorage<{
     PenghuCounty: [],
 });
 export const cityRailwayOverlayAtom = atomWithStorage<{
-    [key: string]: { geo: CityRailwayGeo[], stations: CityRailwayStation[] } | undefined;
+    [key: string]: (CityRailwayGeo & {Stations: CityRailwayStation[]})[] | undefined;
 }>("CityRailway", {});
 export const showCityOverlayAtom = atom<string[]>([]);
 export const showCityRailwayOverlayAtom = atom<string[]>([]);

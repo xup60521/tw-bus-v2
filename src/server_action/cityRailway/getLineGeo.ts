@@ -1,6 +1,6 @@
 "use server";
 
-import { cityRailwayGeo, cityRailwayStation } from "@/lib/LineData";
+import { cityRailwayGeo } from "@/lib/LineData";
 import type {
     CityRailwayGeo,
     CityRailwayStation,
@@ -8,13 +8,10 @@ import type {
 
 export async function getLineGeo(systemList: string[]) {
     const data = {} as {
-        [key: string]: {
-            geo: CityRailwayGeo[];
-            stations: CityRailwayStation[];
-        };
+        [key: string]: (CityRailwayGeo & {Stations: CityRailwayStation[]})[]
     };
     systemList.forEach((d) => {
-        data[d] = { geo: cityRailwayGeo[d], stations: cityRailwayStation[d] };
+        data[d] = cityRailwayGeo[d];
     });
     return data;
 }

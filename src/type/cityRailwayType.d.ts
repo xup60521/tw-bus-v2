@@ -5,7 +5,6 @@ export type CityRailwayGeo = {
     UpdateTime: string;
     Geometry: string;
     EncodedPolyline?: string;
-    ShowOverlay?: boolean;
 };
 
 type Name = {
