@@ -1,11 +1,37 @@
+import { getBusShape } from "@/server_action/getBusShape";
+import { getBusStops } from "@/server_action/getBusStops";
 import type { BusGeo, BusOverlay, BusStops, SearchBus } from "@/type/busType";
-import type { CityRailwayGeo, CityRailwayOverlay, CityRailwayStation } from "@/type/cityRailwayType";
+import type {
+    CityRailwayGeo,
+    CityRailwayOverlay,
+    CityRailwayStation,
+} from "@/type/cityRailwayType";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
+import { create } from "zustand";
+
 export const pageAtom = atom("");
-export const busStopsAtom = atom<BusStops[]>([]);
-export const busShapeAtom = atom<BusGeo[]>([]);
+
+export interface BusStopsGeoState {
+    busStops: BusStops[];
+    busShape: BusGeo[];
+    fetchStopsGeoData: (bus: string, city: string) => void;
+}
+
+export const useBusStopsGeoStore = create<BusStopsGeoState>((set) => ({
+    busStops: [],
+    busShape: [],
+    fetchStopsGeoData: async (bus, city) => {
+        const busStops = await getBusStops(bus, city);
+        const busShape = await getBusShape(bus, city);
+        set({
+            busStops,
+            busShape,
+        });
+    },
+}));
+
 export const toggleStopAtom = atom<{
     stopName?: string;
     id: number;

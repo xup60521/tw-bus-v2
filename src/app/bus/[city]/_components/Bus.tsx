@@ -22,10 +22,10 @@ import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { getBusEst } from "@/server_action/getBusEst";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
-    busStopsAtom,
     overlayAtom,
     pageAtom,
     toggleStopAtom,
+    useBusStopsGeoStore,
 } from "@/state/busState";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -58,7 +58,8 @@ export default function Bus({
         searchParams.get("direction") ?? ""
     );
     const [open, setOpen] = useState(false);
-    const busStops = useAtomValue(busStopsAtom);
+    // const busStops = useAtomValue(busStopsAtom);
+    const { busStops } = useBusStopsGeoStore();
     const busEst = useQuery({
         queryKey: ["busEst"],
         queryFn: () => getBusEst(city, bus),
@@ -83,7 +84,7 @@ export default function Bus({
 
     useEffect(() => {
         busEst.refetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bus]);
 
     return (
@@ -353,74 +354,91 @@ function DrawerSection({
                                     />
                                 ) : (
                                     (() => {
-                                        const list = data.map((d) => {
-                                    
-                                            return d.SubRoutes.map(item => {
-                                                return (
-                                                    <Fragment
-                                                        key={`fragment ${item.Direction} ${item.SubRouteName.Zh_tw}`}
-                                                    >
-                                                        <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
-            
-                                                        <div
-                                                            onClick={() => {
-                                                                closeBtnRef.current?.click();
-                                                                setQString("");
-                                                                setDirection("0");
-                                                                setURLSearchParams([
-                                                                    {
-                                                                        key: "bus",
-                                                                        value: item
-                                                                            .SubRouteName
-                                                                            .Zh_tw,
-                                                                    },
-                                                                    {
-                                                                        key: "direction",
-                                                                        value: `${item.Direction}`,
-                                                                    },
-                                                                ]);
-                                                            }}
-                                                            className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
-                                                        >
-                                                            {`${item.SubRouteName.Zh_tw} ${item.Headsign}`}
-                                                        </div>
-                                                    </Fragment>
+                                        const list = data
+                                            .map((d) => {
+                                                return d.SubRoutes.map(
+                                                    (item) => {
+                                                        return (
+                                                            <Fragment
+                                                                key={`fragment ${item.Direction} ${item.SubRouteName.Zh_tw}`}
+                                                            >
+                                                                <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
+
+                                                                <div
+                                                                    onClick={() => {
+                                                                        closeBtnRef.current?.click();
+                                                                        setQString(
+                                                                            ""
+                                                                        );
+                                                                        setDirection(
+                                                                            "0"
+                                                                        );
+                                                                        setURLSearchParams(
+                                                                            [
+                                                                                {
+                                                                                    key: "bus",
+                                                                                    value: item
+                                                                                        .SubRouteName
+                                                                                        .Zh_tw,
+                                                                                },
+                                                                                {
+                                                                                    key: "direction",
+                                                                                    value: `${item.Direction}`,
+                                                                                },
+                                                                            ]
+                                                                        );
+                                                                    }}
+                                                                    className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                                >
+                                                                    {`${item.SubRouteName.Zh_tw} ${item.Headsign}`}
+                                                                </div>
+                                                            </Fragment>
+                                                        );
+                                                    }
                                                 );
                                             })
-                                        }).flat()
-                                        return <Virtuoso
-                                        style={{
-                                            height: "60vh",
-                                            overflowX: "hidden",
-                                        }}
-                                        totalCount={list.length + 1}
-                                        itemContent={index => {
-                                            if (index === 0) {
-                                                return (
-                                                    <div
-                                                        onClick={() => {
-                                                            setURLSearchParams([
-                                                                {
-                                                                    key: "bus",
-                                                                    value: "",
-                                                                },
-                                                                {
-                                                                    key: "direction",
-                                                                    value: "",
-                                                                },
-                                                            ]);
-                                                            setDirection("");
-                                                            setOpen(false);
-                                                        }}
-                                                        className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
-                                                    >
-                                                        取消選取
-                                                    </div>
-                                                );
-                                            }
-                                            return list[index-1]
-                                        }}
-                                        />;
+                                            .flat();
+                                        return (
+                                            <Virtuoso
+                                                style={{
+                                                    height: "60vh",
+                                                    overflowX: "hidden",
+                                                }}
+                                                totalCount={list.length + 1}
+                                                itemContent={(index) => {
+                                                    if (index === 0) {
+                                                        return (
+                                                            <div
+                                                                onClick={() => {
+                                                                    setURLSearchParams(
+                                                                        [
+                                                                            {
+                                                                                key: "bus",
+                                                                                value: "",
+                                                                            },
+                                                                            {
+                                                                                key: "direction",
+                                                                                value: "",
+                                                                            },
+                                                                        ]
+                                                                    );
+                                                                    setDirection(
+                                                                        ""
+                                                                    );
+                                                                    setOpen(
+                                                                        false
+                                                                    );
+                                                                }}
+                                                                className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
+                                                            >
+                                                                取消選取
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return list[index - 1];
+                                                }}
+                                            />
+                                        );
                                     })()
                                 )}
                                 {/* {city !== "InterCity" ? data.map((item) => {

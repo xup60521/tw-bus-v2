@@ -10,11 +10,10 @@ import { useEffect, useState } from "react";
 import { getAllBus } from "@/server_action/getAllBus";
 import { useHydrateAtoms } from "jotai/utils";
 import {
-    busShapeAtom,
-    busStopsAtom,
     cityRailwayOverlayAtom,
     pageAtom,
     showCityRailwayOverlayAtom,
+    useBusStopsGeoStore,
 } from "@/state/busState";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getBusStops } from "@/server_action/getBusStops";
@@ -54,8 +53,9 @@ export default function Nav({
     const searchParams = useSearchParams();
     useHydrateAtoms([[pageAtom, searchParams.get("page") ?? "bus"]]);
     const page = useAtomValue(pageAtom);
-    const setBusShape = useSetAtom(busShapeAtom);
-    const setBusStops = useSetAtom(busStopsAtom);
+    // const setBusShape = useSetAtom(busShapeAtom);
+    // const setBusStops = useSetAtom(busStopsAtom);
+    const { fetchStopsGeoData } = useBusStopsGeoStore();
     const [cityRailwayOverlay, setCityRailwayOverlay] = useAtom(
         cityRailwayOverlayAtom
     );
@@ -65,67 +65,70 @@ export default function Nav({
     const router = useRouter();
 
     useEffect(() => {
-        if (bus) {
-            getBusStops(bus, city)
-                .then((stops) => {
-                    setBusStops([...stops]);
-                    getBusShape(bus, city)
-                        .then((shapes) => {
-                            const withDirectionData = shapes
-                                .map((item, index, arr) => {
-                                    const d0 = stops
-                                        .find(
-                                            (d) =>
-                                                d.Direction === 0 &&
-                                                d.RouteName.Zh_tw === bus
-                                        )
-                                        ?.Stops.sort(
-                                            (a, b) =>
-                                                a.StopSequence - b.StopSequence
-                                        )[0].StopPosition;
-                                    const d1 = stops
-                                        .find(
-                                            (d) =>
-                                                d.Direction === 1 &&
-                                                d.RouteName.Zh_tw === bus
-                                        )
-                                        ?.Stops.sort(
-                                            (a, b) =>
-                                                a.StopSequence - b.StopSequence
-                                        )[0].StopPosition;
-                                    if (item.Direction) {
-                                        return item;
-                                    } else if (arr.length === 2 && d0 && d1) {
-                                        const position = LinearToArray(
-                                            item.Geometry
-                                        )[0] as [number, number];
-                                        const length_to_d0 =
-                                            (position[0] - d0.PositionLat) **
-                                                2 +
-                                            (position[1] - d0.PositionLon) ** 2;
-                                        const length_to_d1 =
-                                            (position[0] - d1.PositionLat) **
-                                                2 +
-                                            (position[1] - d1.PositionLon) ** 2;
-                                        if (length_to_d0 >= length_to_d1) {
-                                            item.Direction = 1;
-                                        } else {
-                                            item.Direction = 0;
-                                        }
-
-                                        return item;
-                                    } else {
-                                        item.Direction = index;
-                                        return item;
-                                    }
-                                })
-                                .sort((a, b) => a.Direction - b.Direction);
-                            setBusShape([...withDirectionData]);
-                        })
-                        .catch((shapErr) => alert(shapErr));
-                })
-                .catch((StopsErr) => alert(StopsErr));
+        if (bus && city) {
+            fetchStopsGeoData(bus, city)
         }
+        // if (bus) {
+        //     getBusStops(bus, city)
+        //         .then((stops) => {
+        //             setBusStops([...stops]);
+        //             getBusShape(bus, city)
+        //                 .then((shapes) => {
+        //                     const withDirectionData = shapes
+        //                         .map((item, index, arr) => {
+        //                             const d0 = stops
+        //                                 .find(
+        //                                     (d) =>
+        //                                         d.Direction === 0 &&
+        //                                         d.RouteName.Zh_tw === bus
+        //                                 )
+        //                                 ?.Stops.sort(
+        //                                     (a, b) =>
+        //                                         a.StopSequence - b.StopSequence
+        //                                 )[0].StopPosition;
+        //                             const d1 = stops
+        //                                 .find(
+        //                                     (d) =>
+        //                                         d.Direction === 1 &&
+        //                                         d.RouteName.Zh_tw === bus
+        //                                 )
+        //                                 ?.Stops.sort(
+        //                                     (a, b) =>
+        //                                         a.StopSequence - b.StopSequence
+        //                                 )[0].StopPosition;
+        //                             if (item.Direction) {
+        //                                 return item;
+        //                             } else if (arr.length === 2 && d0 && d1) {
+        //                                 const position = LinearToArray(
+        //                                     item.Geometry
+        //                                 )[0] as [number, number];
+        //                                 const length_to_d0 =
+        //                                     (position[0] - d0.PositionLat) **
+        //                                         2 +
+        //                                     (position[1] - d0.PositionLon) ** 2;
+        //                                 const length_to_d1 =
+        //                                     (position[0] - d1.PositionLat) **
+        //                                         2 +
+        //                                     (position[1] - d1.PositionLon) ** 2;
+        //                                 if (length_to_d0 >= length_to_d1) {
+        //                                     item.Direction = 1;
+        //                                 } else {
+        //                                     item.Direction = 0;
+        //                                 }
+
+        //                                 return item;
+        //                             } else {
+        //                                 item.Direction = index;
+        //                                 return item;
+        //                             }
+        //                         })
+        //                         .sort((a, b) => a.Direction - b.Direction);
+        //                     setBusShape([...withDirectionData]);
+        //                 })
+        //                 .catch((shapErr) => alert(shapErr));
+        //         })
+        //         .catch((StopsErr) => alert(StopsErr));
+        // }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bus]);
 
@@ -136,12 +139,14 @@ export default function Nav({
                 waitedforfetch = waitedforfetch.filter((a) => a !== d);
             }
         });
-        if (waitedforfetch.length !== 0) {getLineGeo(waitedforfetch).then((res) => {
-            setCityRailwayOverlay((prev) => {
-                return { ...prev, ...res };
+        if (waitedforfetch.length !== 0) {
+            getLineGeo(waitedforfetch).then((res) => {
+                setCityRailwayOverlay((prev) => {
+                    return { ...prev, ...res };
+                });
             });
-        });}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showCityRailwayOverlay]);
 
     return (

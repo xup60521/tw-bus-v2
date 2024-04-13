@@ -13,12 +13,11 @@ import "leaflet/dist/leaflet.css";
 import { useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
 import {
-    busShapeAtom,
-    busStopsAtom,
     cityRailwayOverlayAtom,
     overlayAtom,
     showCityOverlayAtom,
     showCityRailwayOverlayAtom,
+    useBusStopsGeoStore,
 } from "@/state/busState";
 import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
 import ShowMarker from "./ShowMarker";
@@ -30,9 +29,7 @@ import {
     MultilinearToArray,
     cityRailwayToColor,
 } from "@/lib/utils";
-import {
-    CityRailwayOverlay,
-} from "@/type/cityRailwayType";
+import { CityRailwayOverlay } from "@/type/cityRailwayType";
 
 export default function Map() {
     const position = useMemo(
@@ -43,8 +40,9 @@ export default function Map() {
     const bus = searchParams.get("bus") ?? "";
     const direction = searchParams.get("direction") ?? "";
     const station = searchParams.get("station") ?? "";
-    const busShape = useAtomValue(busShapeAtom);
-    const busStops = useAtomValue(busStopsAtom);
+    // const busShape = useAtomValue(busShapeAtom);
+    // const busStops = useAtomValue(busStopsAtom);
+    const { busShape, busStops } = useBusStopsGeoStore();
     const busOverlay = useAtomValue(overlayAtom);
     const cityRailwayOverlay = useAtomValue(cityRailwayOverlayAtom);
     const showCityOverlay = useAtomValue(showCityOverlayAtom);
@@ -321,7 +319,7 @@ const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
                     (d) => d.StopName.Zh_tw === data.name
                 );
                 if (!item) {
-                    return null
+                    return null;
                 }
                 let h = "";
                 data.passby.forEach((item, index, arr) => {
@@ -347,13 +345,13 @@ const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
                         transform: translate(-50%, -50%);">${h}</span>`;
                     }
                 });
-                const popupText = data.passby.map(item => {
-                    const color = getColor(item)
+                const popupText = data.passby.map((item) => {
+                    const color = getColor(item);
                     return {
                         name: item,
-                        color
-                    }
-                })
+                        color,
+                    };
+                });
                 const icon = new DivIcon({
                     className: "my-custom-pin",
                     iconAnchor: [0, 0],
@@ -424,49 +422,50 @@ const ShowCityRailwayPolylines = ({
     cityRailwayOverlay?: CityRailwayOverlay[];
     c: string;
 }) => {
-    
     if (!cityRailwayOverlay) {
         return null;
     }
-    return cityRailwayOverlay.filter(d => d.ShowOverlay).map((item) => {
-        const regex = /MULTILINESTRING/;
-        const a = cityRailwayToColor[c];
-        const color = (a ? a[item.LineID] : undefined) ?? "#000";
-        const weight = 3;
-        const opacity = 1;
-        if (regex.test(item.Geometry)) {
-            const positionArr = MultilinearToArray(item.Geometry);
-            return positionArr.map((d, i) => {
-                return (
-                    <ShowPolyline
-                        routeName={item.LineName.Zh_tw}
-                        key={`cityRailway polylines ${i} ${item.LineName}`}
-                        positions={d}
-                        pathOptions={{
-                            opacity,
-                            color,
-                            weight,
-                        }}
-                        headSign={item.LineName.Zh_tw}
-                    />
-                );
-            });
-        }
-        const positionArr = LinearToArray(item.Geometry);
-        return (
-            <ShowPolyline
-                routeName={item.LineName.Zh_tw}
-                key={`cityRailway ${item.LineName.Zh_tw}`}
-                positions={positionArr}
-                pathOptions={{
-                    opacity,
-                    color,
-                    weight,
-                }}
-                headSign={item.LineName.Zh_tw}
-            />
-        );
-    });
+    return cityRailwayOverlay
+        .filter((d) => d.ShowOverlay)
+        .map((item) => {
+            const regex = /MULTILINESTRING/;
+            const a = cityRailwayToColor[c];
+            const color = (a ? a[item.LineID] : undefined) ?? "#000";
+            const weight = 3;
+            const opacity = 1;
+            if (regex.test(item.Geometry)) {
+                const positionArr = MultilinearToArray(item.Geometry);
+                return positionArr.map((d, i) => {
+                    return (
+                        <ShowPolyline
+                            routeName={item.LineName.Zh_tw}
+                            key={`cityRailway polylines ${i} ${item.LineName}`}
+                            positions={d}
+                            pathOptions={{
+                                opacity,
+                                color,
+                                weight,
+                            }}
+                            headSign={item.LineName.Zh_tw}
+                        />
+                    );
+                });
+            }
+            const positionArr = LinearToArray(item.Geometry);
+            return (
+                <ShowPolyline
+                    routeName={item.LineName.Zh_tw}
+                    key={`cityRailway ${item.LineName.Zh_tw}`}
+                    positions={positionArr}
+                    pathOptions={{
+                        opacity,
+                        color,
+                        weight,
+                    }}
+                    headSign={item.LineName.Zh_tw}
+                />
+            );
+        });
 };
 const ShowCityRailwayStations = ({
     cityRailwayStations,
@@ -478,7 +477,10 @@ const ShowCityRailwayStations = ({
     if (!cityRailwayStations) {
         return null;
     }
-    const flatStations = cityRailwayStations.filter(d => d.ShowOverlay).map((d) => d.Stations).flat();
+    const flatStations = cityRailwayStations
+        .filter((d) => d.ShowOverlay)
+        .map((d) => d.Stations)
+        .flat();
     const allStationName = flatStations
         .map((item) => {
             return item.StationName.Zh_tw;
