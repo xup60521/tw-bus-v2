@@ -14,10 +14,10 @@ import { useSearchParams } from "next/navigation";
 import { useAtomValue } from "jotai";
 import {
     cityRailwayOverlayAtom,
-    overlayAtom,
     showCityOverlayAtom,
     showCityRailwayOverlayAtom,
     useBusStopsGeoStore,
+    useOverlayStore,
 } from "@/state/busState";
 import type { BusGeo, BusOverlay, BusStops } from "@/type/busType";
 import ShowMarker from "./ShowMarker";
@@ -43,7 +43,7 @@ export default function Map() {
     // const busShape = useAtomValue(busShapeAtom);
     // const busStops = useAtomValue(busStopsAtom);
     const { busShape, busStops } = useBusStopsGeoStore();
-    const busOverlay = useAtomValue(overlayAtom);
+    const { busOverlay } = useOverlayStore();
     const cityRailwayOverlay = useAtomValue(cityRailwayOverlayAtom);
     const showCityOverlay = useAtomValue(showCityOverlayAtom);
     const showCityRailwayOverlay = useAtomValue(showCityRailwayOverlayAtom);
@@ -127,6 +127,7 @@ export default function Map() {
                             }
                         />
                         <ShowOverlayStops
+                            c={c}
                             busOverlay={
                                 busOverlay[c]?.filter((d) => d.ShowOverlay) ??
                                 []
@@ -288,7 +289,13 @@ const ShowOverlayPolylines = ({
     );
 };
 
-const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
+const ShowOverlayStops = ({
+    busOverlay,
+    c,
+}: {
+    busOverlay: BusOverlay[];
+    c: string;
+}) => {
     const flatall = busOverlay
         .filter((d) => d.ShowOverlay)
         .map((d) => d.Stops)
@@ -314,7 +321,7 @@ const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
     const getColor = useOverlayColor();
     return (
         <>
-            {flatNameWithRouteList.map((data) => {
+            {flatNameWithRouteList.map((data, index) => {
                 const item = flatall.find(
                     (d) => d.StopName.Zh_tw === data.name
                 );
@@ -362,6 +369,7 @@ const ShowOverlayStops = ({ busOverlay }: { busOverlay: BusOverlay[] }) => {
                     <>
                         {!!item && (
                             <ShowMarker
+                                key={`showMarker ${data.name} ${index} ${c}`}
                                 item={item}
                                 currentStation=""
                                 icon={icon}

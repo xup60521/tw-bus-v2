@@ -1,7 +1,7 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { overlayAtom, pageAtom } from "@/state/busState";
+import { pageAtom, useOverlayStore } from "@/state/busState";
 import type { BusRoutePassBy } from "@/type/busType";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
@@ -52,7 +52,7 @@ export default function Station({ city }: { city: string }) {
 
     useEffect(() => {
         data.refetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [station]);
 
     return (
@@ -110,7 +110,7 @@ const BusList = ({
     setOpenInfo: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentBus: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-    const busOverlay = useAtomValue(overlayAtom);
+    const { busOverlay } = useOverlayStore();
     const add_remove_overlay = useOverlay({ city });
     const setURLSearchParams = useSetURLSearchParams();
     const setPage = useSetAtom(pageAtom);

@@ -26,11 +26,12 @@ import { FaTrash } from "react-icons/fa6";
 import { FiMenu } from "react-icons/fi";
 import {
     cityRailwayOverlayAtom,
-    overlayAtom,
+    // overlayAtom,
     pageAtom,
     showCityOverlayAtom,
     showCityRailwayOverlayAtom,
     togglePolylineAtom,
+    useOverlayStore,
 } from "@/state/busState";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import { Switch } from "@/components/ui/switch";
@@ -53,7 +54,8 @@ import { CityRailwayOverlay } from "@/type/cityRailwayType";
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Overlay({ city }: { city: string }) {
-    const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
+    const { busOverlay, show_CityOverlay, hide_CityOverlay } =
+        useOverlayStore();
     const [cityRailwayOverlay, setCityRailwayOverlay] = useAtom(
         cityRailwayOverlayAtom
     );
@@ -61,6 +63,7 @@ export default function Overlay({ city }: { city: string }) {
     const [showCityRailwayOverlay, setShowCityRailwayOverlay] = useAtom(
         showCityRailwayOverlayAtom
     );
+    const d = useOverlayStore();
     const router = useRouter();
 
     return (
@@ -170,19 +173,7 @@ export default function Overlay({ city }: { city: string }) {
                     <button
                         className="transition-all hover:text-orange-200"
                         onClick={() => {
-                            setBusOverlay((prev) => {
-                                showCityOverlay.forEach((c) => {
-                                    const newArr = prev[c]?.map((d) => {
-                                        d.ShowOverlay = true;
-                                        return d;
-                                    });
-                                    if (!newArr) {
-                                        return { ...prev };
-                                    }
-                                    prev[c] = newArr;
-                                });
-                                return { ...prev };
-                            });
+                            show_CityOverlay(showCityOverlay);
                             setCityRailwayOverlay((prev) => {
                                 showCityRailwayOverlay.forEach((c) => {
                                     const newArr = prev[c]?.map((d) => {
@@ -204,19 +195,7 @@ export default function Overlay({ city }: { city: string }) {
                     <button
                         className="transition-all hover:text-orange-200"
                         onClick={() => {
-                            setBusOverlay((prev) => {
-                                showCityOverlay.forEach((c) => {
-                                    const newArr = prev[c]?.map((d) => {
-                                        d.ShowOverlay = false;
-                                        return d;
-                                    });
-                                    if (!newArr) {
-                                        return { ...prev };
-                                    }
-                                    prev[c] = newArr;
-                                });
-                                return { ...prev };
-                            });
+                            hide_CityOverlay(showCityOverlay);
                             setCityRailwayOverlay((prev) => {
                                 showCityRailwayOverlay.forEach((c) => {
                                     const newArr = prev[c]?.map((d) => {
@@ -238,6 +217,19 @@ export default function Overlay({ city }: { city: string }) {
             </div>
             <div className="w-full border-t-[1px] border-white"></div>
             <ScrollArea className="w-full h-full p-1 pr-3">
+                {/* {JSON.stringify(d.busOverlay)} */}
+                {showCityOverlay.map((c) => {
+                    return (
+                        <OverlayList
+                            key={`overlay page show list ${c}`}
+                            busOverlay={busOverlay}
+                            // setBusOverlay={setBusOverlay}
+                            c={c}
+                            city={city}
+                            router={router}
+                        />
+                    );
+                })}
                 {showCityRailwayOverlay.map((c) => {
                     return (
                         <CityRailwayOverlayList
@@ -248,18 +240,6 @@ export default function Overlay({ city }: { city: string }) {
                         />
                     );
                 })}
-                {showCityOverlay.map((c) => {
-                    return (
-                        <OverlayList
-                            key={`overlay page show list ${c}`}
-                            busOverlay={busOverlay}
-                            setBusOverlay={setBusOverlay}
-                            c={c}
-                            city={city}
-                            router={router}
-                        />
-                    );
-                })}
             </ScrollArea>
         </div>
     );
@@ -267,16 +247,16 @@ export default function Overlay({ city }: { city: string }) {
 
 const OverlayList = ({
     busOverlay,
-    setBusOverlay,
+    // setBusOverlay,
     c,
     city,
     router,
 }: {
     busOverlay: { [key: string]: BusOverlay[] | undefined };
-    setBusOverlay: SetAtom<
-        [SetStateAction<{ [key: string]: BusOverlay[] | undefined }>],
-        void
-    >;
+    // setBusOverlay: SetAtom<
+    //     [SetStateAction<{ [key: string]: BusOverlay[] | undefined }>],
+    //     void
+    // >;
     c: string;
     city: string;
     router: AppRouterInstance;
@@ -290,22 +270,15 @@ const OverlayList = ({
     const [openPopup, setOpenPopup] = useState(false);
     const [currentBus, setCurrentBus] = useState("");
     const [currentDirection, setCurrentDirection] = useState(0);
+    const { removeOverlay, show_CityOverlay, hide_CityOverlay, toggle_CityOverlay } =
+        useOverlayStore();
 
     const handleRemove = (
         name: string,
         direction: number,
         headSign: string
     ) => {
-        setBusOverlay((prev) => {
-            const filtered =
-                prev[c]?.filter(
-                    (item) =>
-                        item.RouteName.Zh_tw !== name ||
-                        item.Direction !== direction
-                ) ?? [];
-            prev[c] = filtered;
-            return { ...prev };
-        });
+        removeOverlay(c, name, `${direction}`);
         toast({
             title: "刪除成功",
             description: `${name}（${headSign}）`,
@@ -330,17 +303,7 @@ const OverlayList = ({
                         <button
                             className="text-gray-300 hover:text-orange-200"
                             onClick={() => {
-                                setBusOverlay((prev) => {
-                                    const data = prev[c];
-                                    if (!data) {
-                                        return { ...prev };
-                                    }
-                                    prev[c] = data.map((d) => {
-                                        d.ShowOverlay = true;
-                                        return d;
-                                    });
-                                    return { ...prev };
-                                });
+                                show_CityOverlay([c])
                             }}
                         >
                             全部顯示
@@ -349,17 +312,7 @@ const OverlayList = ({
                         <button
                             className="text-gray-300 hover:text-orange-200"
                             onClick={() => {
-                                setBusOverlay((prev) => {
-                                    const data = prev[c];
-                                    if (!data) {
-                                        return { ...prev };
-                                    }
-                                    prev[c] = data.map((d) => {
-                                        d.ShowOverlay = false;
-                                        return d;
-                                    });
-                                    return { ...prev };
-                                });
+                                hide_CityOverlay([c])
                             }}
                         >
                             全部隱藏
@@ -504,25 +457,7 @@ const OverlayList = ({
                                     checked={item.ShowOverlay}
                                     className="-ml-2"
                                     onCheckedChange={(e) => {
-                                        setBusOverlay((prev) => {
-                                            const newArr = prev[c]?.map((d) => {
-                                                if (
-                                                    d.RouteName.Zh_tw ===
-                                                        item.RouteName.Zh_tw &&
-                                                    d.Direction ===
-                                                        item.Direction
-                                                ) {
-                                                    d.ShowOverlay = e;
-                                                    return d;
-                                                }
-                                                return d;
-                                            });
-                                            if (!newArr) {
-                                                return { ...prev };
-                                            }
-                                            prev[c] = newArr;
-                                            return { ...prev };
-                                        });
+                                        toggle_CityOverlay(c, item.RouteName.Zh_tw, `${item.Direction}`, e)
                                     }}
                                 />
                             </div>

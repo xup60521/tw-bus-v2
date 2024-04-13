@@ -1,6 +1,5 @@
 "use client";
 import dynamic from "next/dynamic";
-import Nav from "./_components/Nav";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
 import ReactQuery from "./_components/ReactQueryClient";
@@ -12,12 +11,13 @@ import { showCityOverlayAtom, showCityRailwayOverlayAtom } from "@/state/busStat
 
 
 const Map = dynamic(() => import("./_components/Map"), { ssr: false });
+const Nav = dynamic(()=>import("./_components/Nav"), {ssr: false})
 export default function City({ params }: { params: { city: string } }) {
   const { city } = params;
   const [openNav, setOpenNav] = useState(false);
   const [initBusList, setInitBusList] = useState<BusList[]>([]);
   const setShowCityOverlay = useSetAtom(showCityOverlayAtom)
-  const setCityRailwayOverlay = useSetAtom(showCityRailwayOverlayAtom)
+  const setShowCityRailwayOverlay = useSetAtom(showCityRailwayOverlayAtom)
   useEffect(() => {
     getAllBus(city).then((res: BusList[]) => {
       setInitBusList([...res]);
@@ -25,16 +25,16 @@ export default function City({ params }: { params: { city: string } }) {
     setOpenNav(true)
     setShowCityOverlay([city])
     if (["Taipei", "NewTaipei"].includes(city)) {
-        setCityRailwayOverlay(["tp", "ty"])
+        setShowCityRailwayOverlay(["tp", "ty"])
     }
     if (city === "Taoyuan") {
-        setCityRailwayOverlay(["ty"])
+        setShowCityRailwayOverlay(["ty"])
     }
     if (["Taichung","ChanghuaCounty"].includes(city)) {
-        setCityRailwayOverlay(["tc"])
+        setShowCityRailwayOverlay(["tc"])
     }
     if (city === "Kaohsiung") {
-        setCityRailwayOverlay(["ks"])
+        setShowCityRailwayOverlay(["ks"])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -22,10 +22,11 @@ import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { getBusEst } from "@/server_action/getBusEst";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
-    overlayAtom,
+    // overlayAtom,
     pageAtom,
     toggleStopAtom,
     useBusStopsGeoStore,
+    useOverlayStore,
 } from "@/state/busState";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -77,7 +78,7 @@ export default function Bus({
         isOneWay,
     } = useSeparateStops(busStops, busEst.data);
     const add_remove_overlay = useOverlay({ city });
-    const busOverlay = useAtomValue(overlayAtom);
+    const {busOverlay} = useOverlayStore()
     const isOverlayed = !!busOverlay[city]?.find(
         (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
     );
@@ -175,7 +176,7 @@ export default function Bus({
                     </div>
                 </ScrollArea>
             </div>
-            <DrawerSection
+            {!!initBusList.length && <DrawerSection
                 initBusList={initBusList}
                 open={open}
                 setDirection={setDirection}
@@ -183,7 +184,7 @@ export default function Bus({
                 setURLSearchParams={setURLSearchParams}
                 bus={bus}
                 city={city}
-            />
+            />}
         </>
     );
 }
@@ -441,72 +442,6 @@ function DrawerSection({
                                         );
                                     })()
                                 )}
-                                {/* {city !== "InterCity" ? data.map((item) => {
-                                    return (
-                                        <Fragment
-                                            key={`fragment ${item.SubRoutes[0].SubRouteName.Zh_tw}`}
-                                        >
-                                            <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
-
-                                            <div
-                                                onClick={() => {
-                                                    closeBtnRef.current?.click();
-                                                    setQString("");
-                                                    setDirection("0");
-                                                    setURLSearchParams([
-                                                        {
-                                                            key: "bus",
-                                                            value: item
-                                                                .RouteName
-                                                                .Zh_tw,
-                                                        },
-                                                        {
-                                                            key: "direction",
-                                                            value: "0",
-                                                        },
-                                                    ]);
-                                                }}
-                                                className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
-                                            >
-                                                {item.headSign}
-                                            </div>
-                                        </Fragment>
-                                    );
-                                }) : data.map((d) => {
-                                    
-                                    return d.SubRoutes.map(item => {
-                                        return (
-                                            <Fragment
-                                                key={`fragment ${item.Direction} ${item.SubRouteName.Zh_tw}`}
-                                            >
-                                                <div className="w-full border-t-[0.05rem] border-slate-100 mx-1" />
-    
-                                                <div
-                                                    onClick={() => {
-                                                        closeBtnRef.current?.click();
-                                                        setQString("");
-                                                        setDirection("0");
-                                                        setURLSearchParams([
-                                                            {
-                                                                key: "bus",
-                                                                value: item
-                                                                    .SubRouteName
-                                                                    .Zh_tw,
-                                                            },
-                                                            {
-                                                                key: "direction",
-                                                                value: `${item.Direction}`,
-                                                            },
-                                                        ]);
-                                                    }}
-                                                    className="p-2 py-3 rounded-md hover:bg-slate-100 hover:cursor-pointer transition-all"
-                                                >
-                                                    {`${item.SubRouteName.Zh_tw} ${item.Headsign}`}
-                                                </div>
-                                            </Fragment>
-                                        );
-                                    })
-                                })} */}
                             </div>
                         </div>
 

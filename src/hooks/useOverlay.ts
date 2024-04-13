@@ -2,8 +2,9 @@
 
 import { toast } from "@/components/ui/use-toast";
 import {    
-    overlayAtom,
+    // overlayAtom,
     useBusStopsGeoStore,
+    useOverlayStore,
 } from "@/state/busState";
 import { useAtom, useAtomValue } from "jotai";
 import { useSearchParams } from "next/navigation";
@@ -12,7 +13,7 @@ export const useOverlay = ({ city }: { city: string }) => {
     //   const busStops = useAtomValue(busStopsAtom);
     //   const busShape = useAtomValue(busShapeAtom);
     const { busShape, busStops } = useBusStopsGeoStore();
-    const [busOverlay, setBusOverlay] = useAtom(overlayAtom);
+    const {busOverlay, addOverlay, removeOverlay} = useOverlayStore()
     const searchParams = useSearchParams();
     const direction = searchParams.get("direction") ?? "";
     const bus = searchParams.get("bus") ?? "";
@@ -36,19 +37,12 @@ export const useOverlay = ({ city }: { city: string }) => {
             !!thisStops &&
             !!thisShape
         ) {
-            setBusOverlay((prev) => {
-                prev[city] = [
-                    ...(prev[city] ?? []),
-                    {
-                        ...thisShape,
-                        Stops: thisStops.Stops,
-                        ShowOverlay: true,
-                    },
-                ];
-                return {
-                    ...prev,
-                };
-            });
+            const data = {
+                ...thisShape,
+                Stops: thisStops.Stops,
+                ShowOverlay: true,
+            }
+            addOverlay(city, data)
             toast({
                 title: "新增成功",
                 description: `${bus}（${thisStops.Stops[0].StopName.Zh_tw} - ${
@@ -66,15 +60,7 @@ export const useOverlay = ({ city }: { city: string }) => {
                     d.Direction === Number(direction)
             )
         ) {
-            setBusOverlay((prev) => {
-                const filtered = (prev[city] ?? []).filter(
-                    (item) =>
-                        item.Direction !== Number(direction) ||
-                        item.RouteName.Zh_tw !== bus
-                );
-                prev[city] = filtered;
-                return { ...prev };
-            });
+           removeOverlay(city, bus, direction)
             const thisStops = busStops?.find(
                 (d) => d.Direction === Number(direction)
             );

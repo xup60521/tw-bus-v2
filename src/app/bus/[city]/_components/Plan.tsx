@@ -13,11 +13,12 @@ import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import { RNN } from "@/lib/utils";
 import { getPlanRoute } from "@/server_action/getPlanRoute";
 import {
-    overlayAtom,
+    // overlayAtom,
     pageAtom,
     planEndStationAtom,
     planResultAtom,
     planStartStationAtom,
+    useOverlayStore,
 } from "@/state/busState";
 import type { SearchBus } from "@/type/busType";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -146,7 +147,7 @@ const BusList = ({
     setOpenInfo: React.Dispatch<React.SetStateAction<boolean>>;
     setCurrentBus: React.Dispatch<React.SetStateAction<string>>;
 }) => {
-    const busOverlay = useAtomValue(overlayAtom);
+    const { busOverlay } = useOverlayStore();
     const add_remove_overlay = useOverlay({ city });
     const setURLSearchParams = useSetURLSearchParams();
     const setPage = useSetAtom(pageAtom);

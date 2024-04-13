@@ -14,6 +14,7 @@ import {
     pageAtom,
     showCityRailwayOverlayAtom,
     useBusStopsGeoStore,
+    useOverlayStore,
 } from "@/state/busState";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getBusStops } from "@/server_action/getBusStops";
@@ -40,8 +41,7 @@ import ReactSelect from "react-select";
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Plan from "./Plan";
 import { getLineGeo } from "@/server_action/cityRailway/getLineGeo";
-
-const Overlay = dynamic(() => import("./Overlay"), { ssr: false });
+import Overlay from "./Overlay";
 
 export default function Nav({
     city,
@@ -56,17 +56,17 @@ export default function Nav({
     // const setBusShape = useSetAtom(busShapeAtom);
     // const setBusStops = useSetAtom(busStopsAtom);
     const { fetchStopsGeoData } = useBusStopsGeoStore();
+    const { load_localStorage } = useOverlayStore();
     const [cityRailwayOverlay, setCityRailwayOverlay] = useAtom(
         cityRailwayOverlayAtom
     );
     const showCityRailwayOverlay = useAtomValue(showCityRailwayOverlayAtom);
-
     const bus = searchParams.get("bus") ?? "";
     const router = useRouter();
 
     useEffect(() => {
         if (bus && city) {
-            fetchStopsGeoData(bus, city)
+            fetchStopsGeoData(bus, city);
         }
         // if (bus) {
         //     getBusStops(bus, city)
@@ -148,6 +148,11 @@ export default function Nav({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showCityRailwayOverlay]);
+
+    useEffect(() => {
+        load_localStorage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
