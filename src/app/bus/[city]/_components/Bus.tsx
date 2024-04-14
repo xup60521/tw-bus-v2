@@ -29,19 +29,15 @@ import {
     useOverlayStore,
 } from "@/state/busState";
 import { useQuery } from "@tanstack/react-query";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { FiMenu, FiMinus, FiPlus } from "react-icons/fi";
+import { FiMinus, FiPlus } from "react-icons/fi";
+import { CiShare1 } from "react-icons/ci";
 import { useOverlay } from "@/hooks/useOverlay";
 import { useSeparateStops } from "@/hooks/useSeparateStops";
 import RemainningTime from "./RemainningTime";
 import { FaInfo } from "react-icons/fa6";
 import dynamic from "next/dynamic";
 import "@/styles/scrollbar-drawer.css";
+import CardTopDivider from "./CardTopDivider";
 // import scrollbar from "@/styles/scrollbar.module.css"
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
@@ -158,7 +154,7 @@ export default function Bus({
                         </>
                     )}
                 </div>
-                <div className="w-full -m-[1px]"></div>
+                <CardTopDivider />
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-1 py-[6px] pr-2">
                         {!!bus && (
@@ -530,32 +526,24 @@ const StopList = ({
                                     ></span>
                                 </button>
                             </div>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-white p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black">
-                                        <FiMenu />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setPage("station");
-                                            setURLSearchParams([
-                                                {
-                                                    key: "station",
-                                                    value: item.StopName.Zh_tw,
-                                                },
-                                                {
-                                                    key: "page",
-                                                    value: "station",
-                                                },
-                                            ]);
-                                        }}
-                                    >
-                                        <span>查看站牌</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <button
+                                onClick={() => {
+                                    setPage("station");
+                                    setURLSearchParams([
+                                        {
+                                            key: "station",
+                                            value: item.StopName.Zh_tw,
+                                        },
+                                        {
+                                            key: "page",
+                                            value: "station",
+                                        },
+                                    ]);
+                                }}
+                                className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-transparent p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black"
+                            >
+                                <CiShare1 />
+                            </button>
                         </div>
                     );
                 })}

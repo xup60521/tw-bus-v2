@@ -39,7 +39,7 @@ export default function RemainningTime({
             .padStart(2, "0")}`;
 
         return (
-            <div className="w-20 p-1 py-[0.125rem] text-center rounded-md border-slate-100 border-[1px] text-white">
+            <div className="w-20 p-1 text-center rounded-md border-slate-100 border-[1px] text-white">
                 {time}
             </div>
         );
@@ -50,7 +50,7 @@ export default function RemainningTime({
         </div>
     }
     return (
-        <div className="w-20 rounded-md border-[1px] border-slate-100 p-1 py-[0.125rem] text-center text-white">
+        <div className="w-20 p-1 text-center rounded-md border-slate-100 border-[1px] text-white">
             末班駛離
         </div>
     );

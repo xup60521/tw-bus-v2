@@ -20,6 +20,8 @@ import { useSearchParams } from "next/navigation";
 import { useSetURLSearchParams } from "@/hooks/useSetURLSearchParams";
 import RemainningTime from "./RemainningTime";
 import dynamic from "next/dynamic";
+import CardTopDivider from "./CardTopDivider";
+import { CiShare1 } from "react-icons/ci";
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 const PopupSetStation = dynamic(() => import("./PopupSetStation"), {
@@ -66,7 +68,7 @@ export default function Station({ city }: { city: string }) {
                         {station ? station : "選擇站牌..."}
                     </button>
                 </div>
-                <div className="w-full border-t-[1px] border-white"></div>
+                <CardTopDivider />
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-1 p-1 pl-0">
                         <BusList
@@ -176,61 +178,67 @@ const BusList = ({
                                     ></span>
                                 </button>
                             </div>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-white p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black">
-                                        <FiMenu />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setCurrentBus(item.RouteName.Zh_tw);
-                                            setOpenInfo(true);
-                                        }}
-                                    >
-                                        <span>發車資訊</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setPage("bus");
-                                            setURLSearchParams([
-                                                {
-                                                    key: "bus",
-                                                    value: item.RouteName.Zh_tw,
-                                                },
-                                                {
-                                                    key: "direction",
-                                                    value: String(
-                                                        item.Direction === 255
-                                                            ? 0
-                                                            : item.Direction
-                                                    ),
-                                                },
-                                                {
-                                                    key: "page",
-                                                    value: "bus",
-                                                },
-                                            ]);
-                                        }}
-                                    >
-                                        <span>查看路線</span>
-                                    </DropdownMenuItem>
-                                    {bus === item.RouteName.Zh_tw &&
-                                        Number(direction) ===
-                                            item.Direction && (
-                                            <DropdownMenuItem
-                                                onClick={add_remove_overlay}
-                                            >
-                                                <span>
-                                                    {isOverlayed
-                                                        ? "移除疊加路線"
-                                                        : "新增疊加路線"}
-                                                </span>
-                                            </DropdownMenuItem>
-                                        )}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex-grow"></div>
+                            <div className="flex items-center gap-1 py-1">
+                                <button
+                                    onClick={() => {
+                                        setPage("bus");
+                                        setURLSearchParams([
+                                            {
+                                                key: "bus",
+                                                value: item.RouteName.Zh_tw,
+                                            },
+                                            {
+                                                key: "direction",
+                                                value: String(
+                                                    item.Direction === 255
+                                                        ? 0
+                                                        : item.Direction
+                                                ),
+                                            },
+                                            {
+                                                key: "page",
+                                                value: "bus",
+                                            },
+                                        ]);
+                                    }}
+                                    className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-transparent p-1 text-center font-bold text-white transition-all hover:border-white hover:bg-white hover:text-black"
+                                >
+                                    <CiShare1 />
+                                </button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="bg-transparant h-fit  w-fit -translate-x-2 rounded border-[1px] border-transparent p-1 text-center font-bold text-white transition-all hover:bg-white hover:text-black hover:border-white">
+                                            <FiMenu />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setCurrentBus(
+                                                    item.RouteName.Zh_tw
+                                                );
+                                                setOpenInfo(true);
+                                            }}
+                                        >
+                                            <span>發車資訊</span>
+                                        </DropdownMenuItem>
+                                        {bus === item.RouteName.Zh_tw &&
+                                            Number(direction) ===
+                                                item.Direction && (
+                                                <DropdownMenuItem
+                                                    onClick={add_remove_overlay}
+                                                >
+                                                    <span>
+                                                        {isOverlayed
+                                                            ? "移除疊加路線"
+                                                            : "新增疊加路線"}
+                                                    </span>
+                                                </DropdownMenuItem>
+                                            )}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     );
                 })}
