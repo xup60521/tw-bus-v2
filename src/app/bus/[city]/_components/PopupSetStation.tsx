@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaSpinner } from "react-icons/fa6";
 import Popup from "reactjs-popup";
-import {geocoders} from "leaflet-control-geocoder"
+import { geocoders } from "leaflet-control-geocoder";
 import Geohash from "latlon-geohash";
 // import { useToast } from "@/components/ui/use-toast";
 
@@ -16,40 +16,39 @@ export default function PopupSetStation({
     setOpen,
     city,
     setStation,
+    setGeoHash,
 }: {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     city: string;
     setStation: (item: string) => void;
+    setGeoHash?: (geohash: string) => void;
 }) {
     const [result, setResult] = useState<BusStopSearchResult[] | null>(null);
     const [loading, setLoading] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     // const { toast } = useToast();
 
-    
-
     const handleSearch = async () => {
-        const search = inputRef.current?.value
+        const search = inputRef.current?.value;
         if (search && city) {
             setLoading(true);
-            const leafletSearch = () => new Promise<string | undefined>((resolve) => {
-                
-                
-                // const geocoder = L.Control.Geocoder.nominatim();
-                const geocoder = geocoders.nominatim()
-                let geohash;
-                geocoder.geocode(search, (result) => {
-                    const r = result[0];
-                    if (r) {
-                        const { lat, lng } = r?.center;
-                        geohash = Geohash.encode(lat, lng, 6) as string;
-                        resolve(geohash);
-                    }
-                    resolve(undefined)
+            const leafletSearch = () =>
+                new Promise<string | undefined>((resolve) => {
+                    // const geocoder = L.Control.Geocoder.nominatim();
+                    const geocoder = geocoders.nominatim();
+                    let geohash;
+                    geocoder.geocode(search, (result) => {
+                        const r = result[0];
+                        if (r) {
+                            const { lat, lng } = r?.center;
+                            geohash = Geohash.encode(lat, lng, 6) as string;
+                            resolve(geohash);
+                        }
+                        resolve(undefined);
+                    });
                 });
-            });
-            leafletSearch().then(data => {
+            leafletSearch().then((data) => {
                 // toast({
                 //     title: `${data}`,
                 // });
@@ -59,8 +58,7 @@ export default function PopupSetStation({
                         setLoading(false);
                     })
                     .catch((err) => alert(err));
-
-            })
+            });
         }
     };
 
@@ -109,6 +107,17 @@ export default function PopupSetStation({
                                             onClick={() => {
                                                 setOpen(false);
                                                 setStation(item);
+                                                setGeoHash
+                                                    ? setGeoHash(
+                                                          result.find(
+                                                              (d) =>
+                                                                  d.StopName
+                                                                      .Zh_tw ===
+                                                                  item
+                                                          )?.StopPosition
+                                                              .GeoHash ?? ""
+                                                      )
+                                                    : undefined;
                                             }}
                                             key={`${item}`}
                                             className="rounded-md p-2 py-3 transition-all hover:cursor-pointer hover:bg-slate-100"

@@ -52,6 +52,7 @@ import dynamic from "next/dynamic";
 import { Separator } from "@/components/ui/separator";
 import { CityRailwayOverlay } from "@/type/cityRailwayType";
 import { CiShare1 } from "react-icons/ci";
+import CardTopDivider from "./CardTopDivider";
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 export default function Overlay({ city }: { city: string }) {
@@ -216,7 +217,7 @@ export default function Overlay({ city }: { city: string }) {
                     </button>
                 </div>
             </div>
-            <div className="w-full border-t-[1px] border-white"></div>
+            <CardTopDivider />
             <ScrollArea className="w-full h-full p-1 pr-3">
                 {/* {JSON.stringify(d.busOverlay)} */}
                 {showCityOverlay.map((c) => {
@@ -224,7 +225,6 @@ export default function Overlay({ city }: { city: string }) {
                         <OverlayList
                             key={`overlay page show list ${c}`}
                             busOverlay={busOverlay}
-                            // setBusOverlay={setBusOverlay}
                             c={c}
                             city={city}
                             router={router}

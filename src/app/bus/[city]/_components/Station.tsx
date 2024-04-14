@@ -71,14 +71,14 @@ export default function Station({ city }: { city: string }) {
                 <CardTopDivider />
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-1 p-1 pl-0">
-                        <BusList
+                        {data.isSuccess && <BusList
                             city={city}
                             bus={bus}
                             direction={direction}
                             list={data.data}
                             setOpenInfo={setOpenInfo}
                             setCurrentBus={setCurrentBus}
-                        />
+                        />}
                     </div>
                 </ScrollArea>
             </div>

@@ -27,6 +27,7 @@ import { FaSearch } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import CardTopDivider from "./CardTopDivider";
 
 const PopupInfo = dynamic(() => import("./PopupInfo"), { ssr: false });
 const PopupSetStation = dynamic(() => import("./PopupSetStation"), {
@@ -35,6 +36,8 @@ const PopupSetStation = dynamic(() => import("./PopupSetStation"), {
 export default function Plan({ city }: { city: string }) {
     const [openPopup1, setOpenPopup1] = useState(false);
     const [openPopup2, setOpenPopup2] = useState(false);
+    const [geohash1, setGeohash1] = useState("")
+    const [geohash2, setGeohash2] = useState("")
     const [planStartStation, setPlanStartStation] =
         useAtom(planStartStationAtom);
     const [planEndStation, setPlanEndStation] = useAtom(planEndStationAtom);
@@ -54,7 +57,10 @@ export default function Plan({ city }: { city: string }) {
             });
             return;
         }
-        getPlanRoute(city, planStartStation, planEndStation).then((res) =>
+        getPlanRoute(city, planStartStation, planEndStation, {
+            geohash1,
+            geohash2
+        }).then((res) =>
             setSearchResult([...res])
         );
     };
@@ -96,7 +102,8 @@ export default function Plan({ city }: { city: string }) {
                         <FaSearch />
                     </button>
                 </div>
-                <div className="w-full border-t-[1px] border-white"></div>
+                <CardTopDivider />
+                {/* {`${geohash1} ${geohash2}`} */}
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-2 text-lg p-1">
                         <BusList
@@ -121,12 +128,14 @@ export default function Plan({ city }: { city: string }) {
                 setStation={setPlanStartStation}
                 setOpen={setOpenPopup1}
                 open={openPopup1}
+                setGeoHash={setGeohash1}
             />
             <PopupSetStation
                 city={city}
                 setStation={setPlanEndStation}
                 setOpen={setOpenPopup2}
                 open={openPopup2}
+                setGeoHash={setGeohash2}
             />
         </>
     );

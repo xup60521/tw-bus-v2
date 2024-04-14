@@ -91,6 +91,7 @@ export type BusStopSearchResult = {
   StopName: Name;
   UpdateTime: string;
   VersionID: number;
+  StopPosition: StopPosition;
 };
 
 export type BusOverlay = BusGeo & {

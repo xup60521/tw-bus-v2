@@ -45,12 +45,14 @@ export default function RemainningTime({
         );
     }
     if (StopStatus === 1) {
-        return <div className="w-20 rounded-md border-[1px] border-transparent p-1 py-[0.125rem] text-center text-gray-300">
-            未發車
-        </div>
+        return (
+            <div className="w-20 p-1 text-center rounded-md border-slate-100 border-[1px] text-white">
+                未發車
+            </div>
+        );
     }
     return (
-        <div className="w-20 p-1 text-center rounded-md border-slate-100 border-[1px] text-white">
+        <div className="w-20 rounded-md border-[1px] border-transparent p-1 py-[0.125rem] text-center text-gray-300">
             末班駛離
         </div>
     );
