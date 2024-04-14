@@ -78,7 +78,7 @@ export default function Bus({
         isOneWay,
     } = useSeparateStops(busStops, busEst.data);
     const add_remove_overlay = useOverlay({ city });
-    const {busOverlay} = useOverlayStore()
+    const { busOverlay } = useOverlayStore();
     const isOverlayed = !!busOverlay[city]?.find(
         (d) => d.RouteName.Zh_tw === bus && d.Direction === Number(direction)
     );
@@ -116,12 +116,12 @@ export default function Bus({
                                 } relative`}
                             >
                                 <button
-                                    className={`truncate min-h-full rounded-md py-1 text-center border-[1px] font-semibold transition  border-white hover:bg-white hover:text-black ${
+                                    className={`truncate min-h-full p-1 text-center font-semibold transition border-b-2 hover:border-orange-300 box-border ${
                                         isOneWay ? "w-full" : ""
                                     } z-20 ${
                                         direction === "0"
-                                            ? "bg-white text-black"
-                                            : "text-white"
+                                            ? "border-orange-300"
+                                            : " border-transparent"
                                     }`}
                                     onClick={() => {
                                         setDirection("0");
@@ -136,10 +136,10 @@ export default function Bus({
                                     ""
                                 ) : (
                                     <button
-                                        className={`z-20 truncate min-h-full rounded-md p-1 text-center font-semibold border-[1px] transition border-white hover:bg-white hover:text-black ${
+                                        className={`z-20 truncate min-h-full p-1 text-center font-semibold transition box-border border-b-2 hover:border-orange-300 ${
                                             direction === "1"
-                                                ? "text-black bg-white"
-                                                : "text-white"
+                                                ? "border-orange-300"
+                                                : "border-transparent"
                                         }`}
                                         onClick={() => {
                                             setDirection("1");
@@ -158,7 +158,7 @@ export default function Bus({
                         </>
                     )}
                 </div>
-                <div className="w-full border-t-[1px] border-white"></div>
+                <div className="w-full -m-[1px]"></div>
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-1 py-[6px] pr-2">
                         {!!bus && (
@@ -176,15 +176,17 @@ export default function Bus({
                     </div>
                 </ScrollArea>
             </div>
-            {!!initBusList.length && <DrawerSection
-                initBusList={initBusList}
-                open={open}
-                setDirection={setDirection}
-                setOpen={setOpen}
-                setURLSearchParams={setURLSearchParams}
-                bus={bus}
-                city={city}
-            />}
+            {!!initBusList.length && (
+                <DrawerSection
+                    initBusList={initBusList}
+                    open={open}
+                    setDirection={setDirection}
+                    setOpen={setOpen}
+                    setURLSearchParams={setURLSearchParams}
+                    bus={bus}
+                    city={city}
+                />
+            )}
         </>
     );
 }

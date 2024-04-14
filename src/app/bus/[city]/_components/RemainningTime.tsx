@@ -45,7 +45,7 @@ export default function RemainningTime({
         );
     }
     if (StopStatus === 1) {
-        return <div className="w-20 rounded-md border-[1px] border-slate-100 p-1 py-[0.125rem] text-center text-white">
+        return <div className="w-20 rounded-md border-[1px] border-transparent p-1 py-[0.125rem] text-center text-gray-300">
             未發車
         </div>
     }
