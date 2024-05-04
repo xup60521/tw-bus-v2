@@ -2,7 +2,7 @@
 
 import type { BusEst, BusStops } from "@/type/busType";
 
-export function useSeparateStops(busStops: BusStops[], busEst?: BusEst[]) {
+export function useSeparateStops(busStops?: BusStops[], busEst?: BusEst[]) {
   const busStops0 = busStops?.find((item) => item.Direction === 0)?.Stops;
   const headto0 = busStops0?.sort((a, b) => b.StopSequence - a.StopSequence)[0]
     ?.StopName.Zh_tw;

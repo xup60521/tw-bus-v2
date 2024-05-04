@@ -119,7 +119,7 @@ const BusList = ({
 
     return (
         <>
-            {list
+            {Array.isArray(list) && list
                 ?.sort(
                     (a, b) =>
                         Number(RNN(a.RouteName.Zh_tw)) -

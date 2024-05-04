@@ -401,7 +401,7 @@ const ShowStops = ({
         return null;
     }
 
-    if (busStops && bus && direction) {
+    if (Array.isArray(busStops) && bus && direction) {
         const thisDirection = busStops.find(
             (item) => item.Direction === Number(direction)
         );

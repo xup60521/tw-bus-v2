@@ -72,7 +72,7 @@ export default function Bus({
         direction0,
         direction1,
         isOneWay,
-    } = useSeparateStops(busStops, busEst.data);
+    } = useSeparateStops((Array.isArray(busStops) ? busStops : undefined), (Array.isArray(busEst.data) ? busEst.data : undefined));
     const add_remove_overlay = useOverlay({ city });
     const { busOverlay } = useOverlayStore();
     const isOverlayed = !!busOverlay[city]?.find(
@@ -157,6 +157,7 @@ export default function Bus({
                 <CardTopDivider />
                 <ScrollArea className="w-full h-full">
                     <div className="flex w-full flex-col gap-1 py-[6px] pr-2">
+                        {/* {JSON.stringify(busStops)} */}
                         {!!bus && (
                             <StopList
                                 list={
