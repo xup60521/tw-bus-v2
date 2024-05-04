@@ -31,9 +31,13 @@ const PopupInfo = ({
     };
     useEffect(() => {
         if (openPopup) {
-            getBusSchedule(city, bus).then((res) => setBusSchedule([...res]));
+            getBusSchedule(city, bus).then((res) => {
+                if (Array.isArray(res)) {
+                    setBusSchedule([...res]);
+                }
+            });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [openPopup, bus]);
 
     const hasFrequency = !!busSchedule.find((d) => !!d.Frequencys);
@@ -101,40 +105,48 @@ const PopupInfo = ({
                                     Frequency
                                 </p>
                                 <div className="w-full md:grid md:grid-cols-2 gap-2 md:flex-none flex flex-col">
-                                    {["順向","逆向"].map((item, index) => {
-                                        return <div key={`1 ${index}`} className="flex flex-col min-h-0 gap-2">
-                                            <p>{item}</p>
-                                        {busSchedule
-                                            .find(
-                                                (d) =>
-                                                    d.RouteName.Zh_tw === bus &&
-                                                    d.Direction === index
-                                            )
-                                            ?.Frequencys?.filter(
-                                                (d) =>
-                                                    d.ServiceDay[
-                                                        dayOfAWeek[day]
-                                                    ] === 1
-                                            )
-                                            ?.map((item, index) => {
-                                                return (
-                                                    <div
-                                                        key={`0 ${index}`}
-                                                        className="flex w-full"
-                                                    >
-                                                        <p className="w-32">
-                                                            {`${item.StartTime} ~ ${item.EndTime}`.padEnd(
-                                                                50
-                                                            )}
-                                                        </p>
-                                                        <div className="flex flex-wrap">
-                                                            <p className="w-28">{`最長班距：${item.MaxHeadwayMins}`}</p>
-                                                            <p className="w-28">{`最短班距：${item.MinHeadwayMins}`}</p>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                    </div>
+                                    {["順向", "逆向"].map((item, index) => {
+                                        return (
+                                            <div
+                                                key={`1 ${index}`}
+                                                className="flex flex-col min-h-0 gap-2"
+                                            >
+                                                <p>{item}</p>
+                                                {busSchedule
+                                                    .find(
+                                                        (d) =>
+                                                            d.RouteName
+                                                                .Zh_tw ===
+                                                                bus &&
+                                                            d.Direction ===
+                                                                index
+                                                    )
+                                                    ?.Frequencys?.filter(
+                                                        (d) =>
+                                                            d.ServiceDay[
+                                                                dayOfAWeek[day]
+                                                            ] === 1
+                                                    )
+                                                    ?.map((item, index) => {
+                                                        return (
+                                                            <div
+                                                                key={`0 ${index}`}
+                                                                className="flex w-full"
+                                                            >
+                                                                <p className="w-32">
+                                                                    {`${item.StartTime} ~ ${item.EndTime}`.padEnd(
+                                                                        50
+                                                                    )}
+                                                                </p>
+                                                                <div className="flex flex-wrap">
+                                                                    <p className="w-28">{`最長班距：${item.MaxHeadwayMins}`}</p>
+                                                                    <p className="w-28">{`最短班距：${item.MinHeadwayMins}`}</p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                            </div>
+                                        );
                                     })}
                                     {/* <div className="flex flex-col min-h-0 gap-2">
                                         {busSchedule
