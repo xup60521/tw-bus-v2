@@ -19,6 +19,8 @@ import { useAtom, useSetAtom } from "jotai";
 import { route_busAtom, route_directionAtom } from "@/state/routeState";
 import { getAllBus } from "@/server_action/getAllBus";
 
+export const runtime = 'edge';
+
 const Map = dynamic(() => import("./_components/Map"), { ssr: false });
 export default function Page({ params }: { params: { city: string } }) {
   const { city } = params;

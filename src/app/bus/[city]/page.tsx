@@ -9,6 +9,7 @@ import { useSetAtom } from "jotai";
 import { showCityOverlayAtom, showCityRailwayOverlayAtom } from "@/state/busState";
 // import { DevTools } from 'jotai-devtools'
 
+export const runtime = 'edge';
 
 const Map = dynamic(() => import("./_components/Map"), { ssr: false });
 const Nav = dynamic(()=>import("./_components/Nav"), {ssr: false})
