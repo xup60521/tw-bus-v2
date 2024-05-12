@@ -14,7 +14,7 @@ export default function Home() {
             <span className="font-mono text-xl">台灣等公車</span>
           </span>
           <a
-            href={"https://github.com/xup60521/t3-taiwan-bus"}
+            href={"https://github.com/xup60521/tw-bus-v2"}
             target="_blank"
             className="flex h-full items-center"
           >
